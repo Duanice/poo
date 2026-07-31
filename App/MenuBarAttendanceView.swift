@@ -39,10 +39,15 @@ struct MenuBarAttendanceView: View {
                 HStack {
                     Text("今日")
                     Spacer()
-                    Text("\(DakaFormatters.time(today.checkIn)) — \(DakaFormatters.time(today.checkOut))")
-                        .foregroundStyle(.secondary)
-                    Text(AttendanceCalculator.compactDuration(today.durationMinutes))
-                        .monospacedDigit()
+                    if today.isSlacking {
+                        Label("摆烂", systemImage: "moon.zzz.fill")
+                            .foregroundStyle(.purple)
+                    } else {
+                        Text("\(DakaFormatters.time(today.checkIn)) — \(DakaFormatters.time(today.checkOut))")
+                            .foregroundStyle(.secondary)
+                        Text(AttendanceCalculator.compactDuration(today.durationMinutes))
+                            .monospacedDigit()
+                    }
                 }
             } else {
                 Text("今日尚未打卡")
@@ -56,7 +61,38 @@ struct MenuBarAttendanceView: View {
                 Button("现在下班") {
                     store.checkOutNow()
                 }
-                .disabled(store.todayRecord?.checkIn == nil)
+                .disabled(
+                    store.todayRecord?.checkIn == nil
+                        || store.todayRecord?.isSlacking == true
+                )
+                Button(store.todayRecord?.isSlacking == true ? "取消摆烂" : "今天摆烂") {
+                    if store.todayRecord?.isSlacking == true {
+                        _ = store.setSlacking(on: .now, enabled: false)
+                    } else if !store.requiresClearingBeforeSlacking(on: .now) {
+                        _ = store.setSlacking(on: .now, enabled: true)
+                    } else {
+                        openWindow(id: "main")
+                        store.openEditor(on: .now)
+                        NSApp.activate(ignoringOtherApps: true)
+                    }
+                }
+                .tint(.purple)
+            }
+
+            let plan = store.currentCatchUpPlan
+            if !plan.isCompleted {
+                HStack {
+                    Text("追赶计划")
+                    Spacer()
+                    if plan.isImpossible {
+                        Text("已无可打卡日")
+                            .foregroundStyle(.red)
+                    } else {
+                        Text("剩 \(plan.eligibleDays) 天 · 每天 \(AttendanceCalculator.compactDuration(plan.requiredMinutesPerDay))")
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                .font(.caption)
             }
 
             Divider()

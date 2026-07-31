@@ -51,3 +51,90 @@ enum AttendanceCalculator {
         return remainder == 0 ? "\(hours)h" : "\(hours)h \(remainder)m"
     }
 }
+
+enum CatchUpLoadLevel: String, Sendable {
+    case completed
+    case normal
+    case warning
+    case critical
+    case impossible
+}
+
+struct CatchUpPlan: Sendable, Equatable {
+    let completedMinutes: Int
+    let remainingMinutes: Int
+    let eligibleDays: Int
+    let requiredMinutesPerDay: Int
+    let loadLevel: CatchUpLoadLevel
+
+    var isCompleted: Bool {
+        remainingMinutes == 0
+    }
+
+    var isImpossible: Bool {
+        remainingMinutes > 0 && eligibleDays == 0
+    }
+}
+
+struct DailyAttendanceSummary: Sendable, Identifiable, Equatable {
+    let date: Date
+    let durationMinutes: Int
+    let isComplete: Bool
+    let isPartial: Bool
+    let isSlacking: Bool
+
+    var id: Date { date }
+}
+
+enum CatchUpPlanCalculator {
+    static func plan(
+        period: AttendancePeriod,
+        summaries: [DailyAttendanceSummary],
+        targetMinutes: Int,
+        now: Date = .now,
+        calendar: Calendar = .autoupdatingCurrent
+    ) -> CatchUpPlan {
+        let today = calendar.startOfDay(for: now)
+        let summariesInPeriod = summaries.filter { period.contains($0.date) }
+        let completedMinutes = summariesInPeriod
+            .filter { $0.date <= today }
+            .reduce(0) { $0 + $1.durationMinutes }
+        let remainingMinutes = max(0, targetMinutes - completedMinutes)
+
+        let eligibleDays = period.allDays(calendar: calendar).filter { day in
+            guard day >= today else { return false }
+            let summary = summariesInPeriod.first {
+                calendar.isDate($0.date, inSameDayAs: day)
+            }
+            return summary?.isSlacking != true && summary?.isComplete != true
+        }.count
+
+        let requiredMinutes: Int
+        if remainingMinutes == 0 || eligibleDays == 0 {
+            requiredMinutes = 0
+        } else {
+            requiredMinutes = (remainingMinutes + eligibleDays - 1) / eligibleDays
+        }
+
+        let level: CatchUpLoadLevel
+        if remainingMinutes == 0 {
+            level = .completed
+        } else if eligibleDays == 0 {
+            level = .impossible
+        } else if requiredMinutes > 16 * 60 {
+            level = .critical
+        } else if requiredMinutes > 12 * 60 {
+            level = .warning
+        } else {
+            level = .normal
+        }
+
+        return CatchUpPlan(
+            completedMinutes: completedMinutes,
+            remainingMinutes: remainingMinutes,
+            eligibleDays: eligibleDays,
+            requiredMinutesPerDay: requiredMinutes,
+            loadLevel: level
+        )
+    }
+}

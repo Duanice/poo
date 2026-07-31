@@ -30,6 +30,9 @@ struct StatusPill: View {
 
 extension AttendanceRecord {
     var statusText: String {
+        if isSlacking {
+            return "摆烂"
+        }
         if isComplete {
             return "已完成"
         }
@@ -43,9 +46,104 @@ extension AttendanceRecord {
     }
 
     var statusColor: Color {
+        if isSlacking { return .purple }
         if isComplete { return .green }
         if checkIn != nil || checkOut != nil { return .orange }
         return .secondary
+    }
+}
+
+struct FeedbackBanner: View {
+    @EnvironmentObject private var store: AttendanceStore
+    let feedback: AppFeedback
+
+    private var color: Color {
+        switch feedback.style {
+        case .success: .green
+        case .information: .purple
+        case .warning: .orange
+        case .failure: .red
+        }
+    }
+
+    private var icon: String {
+        switch feedback.style {
+        case .success: "checkmark.circle.fill"
+        case .information: "moon.zzz.fill"
+        case .warning: "exclamationmark.triangle.fill"
+        case .failure: "xmark.octagon.fill"
+        }
+    }
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: icon)
+                .font(.title3)
+                .foregroundStyle(color)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(feedback.title)
+                    .font(.subheadline.weight(.semibold))
+                if let detail = feedback.detail {
+                    Text(detail)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+            if feedback.actionTitle != nil {
+                Button(feedback.actionTitle ?? "撤销") {
+                    store.undoLastChange()
+                }
+                .buttonStyle(.bordered)
+            }
+            Button {
+                store.dismissFeedback()
+            } label: {
+                Image(systemName: "xmark")
+            }
+            .buttonStyle(.plain)
+            .foregroundStyle(.secondary)
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+        .background(.thickMaterial, in: RoundedRectangle(cornerRadius: 14))
+        .overlay {
+            RoundedRectangle(cornerRadius: 14)
+                .strokeBorder(color.opacity(0.32))
+        }
+        .shadow(color: .black.opacity(0.18), radius: 18, y: 8)
+        .accessibilityElement(children: .combine)
+    }
+}
+
+struct RecordEditorSheet: View {
+    @EnvironmentObject private var store: AttendanceStore
+    let date: Date
+
+    var body: some View {
+        VStack(spacing: 0) {
+            HStack {
+                Spacer()
+                Button {
+                    store.editRequest = nil
+                } label: {
+                    Label("关闭", systemImage: "xmark")
+                }
+                .keyboardShortcut(.cancelAction)
+            }
+            .padding(.horizontal, 24)
+            .padding(.top, 18)
+
+            ScrollView {
+                TodayEditorView(
+                    workDate: date,
+                    record: store.record(on: date),
+                    title: "编辑打卡记录"
+                )
+                .id(store.changeToken)
+                .padding(24)
+            }
+        }
+        .frame(width: 700, height: 590)
     }
 }
 
@@ -78,6 +176,16 @@ enum DakaFormatters {
             components.day ?? 0,
             components.hour ?? 0,
             components.minute ?? 0
+        )
+    }
+
+    static func deepLinkDate(_ date: Date) -> String {
+        let components = Calendar.current.dateComponents([.year, .month, .day], from: date)
+        return String(
+            format: "%04d-%02d-%02d",
+            components.year ?? 0,
+            components.month ?? 0,
+            components.day ?? 0
         )
     }
 }

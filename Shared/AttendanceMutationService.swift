@@ -4,6 +4,7 @@ import SwiftData
 enum AttendanceMutationError: LocalizedError {
     case invalidTimeRange
     case missingCheckIn
+    case existingRecordRequiresConfirmation
 
     var errorDescription: String? {
         switch self {
@@ -11,6 +12,8 @@ enum AttendanceMutationError: LocalizedError {
             return "下班时间必须晚于上班时间；如跨午夜，请启用“跨午夜”。"
         case .missingCheckIn:
             return "请先设置上班时间。"
+        case .existingRecordRequiresConfirmation:
+            return "该日期已有打卡时间。请确认清空记录后再设为摆烂日。"
         }
     }
 }
@@ -55,6 +58,7 @@ struct AttendanceMutationService {
         item.checkIn = checkIn
         item.checkOut = checkOut
         item.note = note.trimmingCharacters(in: .whitespacesAndNewlines)
+        item.isSlackingFlag = false
         item.updatedAt = .now
         try context.save()
         return item
@@ -66,11 +70,49 @@ struct AttendanceMutationService {
         if existing == nil {
             context.insert(item)
         }
+        item.isSlackingFlag = false
         item.checkIn = date
         if let checkOut = item.checkOut, checkOut <= date {
             item.checkOut = nil
         }
         item.updatedAt = .now
+        try context.save()
+    }
+
+    func setSlacking(
+        on date: Date,
+        enabled: Bool,
+        clearExistingRecord: Bool = false
+    ) throws {
+        let existing = try record(on: date)
+
+        if enabled {
+            if let existing,
+               (existing.checkIn != nil || existing.checkOut != nil),
+               !clearExistingRecord {
+                throw AttendanceMutationError.existingRecordRequiresConfirmation
+            }
+
+            let item = existing ?? AttendanceRecord(workDate: date)
+            if existing == nil {
+                context.insert(item)
+            }
+            if clearExistingRecord {
+                item.checkIn = nil
+                item.checkOut = nil
+            }
+            item.isSlackingFlag = true
+            item.updatedAt = .now
+        } else if let existing {
+            existing.isSlackingFlag = false
+            existing.updatedAt = .now
+            if existing.checkIn == nil,
+               existing.checkOut == nil,
+               existing.note.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                context.delete(existing)
+            }
+        }
+
         try context.save()
     }
 

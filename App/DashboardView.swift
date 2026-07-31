@@ -19,12 +19,21 @@ struct DashboardView: View {
                     targetMinutes: AppSettingsSnapshot.load().targetMinutes
                 )
 
+                CatchUpPlanCard()
+
                 TodayEditorView(
                     workDate: .now,
                     record: store.todayRecord,
                     title: "今日记录"
                 )
                 .id(store.changeToken)
+
+                Card {
+                    CycleCalendarView(
+                        period: store.currentPeriod,
+                        compact: true
+                    )
+                }
 
                 RecentRecordsCard()
             }
@@ -33,6 +42,102 @@ struct DashboardView: View {
             .frame(maxWidth: .infinity)
         }
         .navigationTitle("概览")
+    }
+}
+
+struct CatchUpPlanCard: View {
+    @EnvironmentObject private var store: AttendanceStore
+    @State private var showClearConfirmation = false
+
+    private var plan: CatchUpPlan {
+        store.currentCatchUpPlan
+    }
+
+    private var accentColor: Color {
+        switch plan.loadLevel {
+        case .completed: .green
+        case .normal: .blue
+        case .warning: .orange
+        case .critical, .impossible: .red
+        }
+    }
+
+    private var headline: String {
+        if plan.isCompleted {
+            return "本周期目标已完成"
+        }
+        if plan.isImpossible {
+            return "当前计划无法完成"
+        }
+        return "每天需要 \(AttendanceCalculator.formatDuration(plan.requiredMinutesPerDay))"
+    }
+
+    var body: some View {
+        Card {
+            HStack(spacing: 18) {
+                Image(systemName: plan.isCompleted ? "flag.checkered.circle.fill" : "figure.run.circle.fill")
+                    .font(.system(size: 38))
+                    .foregroundStyle(accentColor)
+                    .frame(width: 58, height: 58)
+                    .background(accentColor.opacity(0.11), in: RoundedRectangle(cornerRadius: 14))
+
+                VStack(alignment: .leading, spacing: 5) {
+                    Text("追赶计划")
+                        .font(.headline)
+                    Text(headline)
+                        .font(.title3.bold().monospacedDigit())
+                    if plan.isCompleted {
+                        Text("已完成 \(AttendanceCalculator.formatDuration(plan.completedMinutes))")
+                            .foregroundStyle(.secondary)
+                    } else if plan.isImpossible {
+                        Text("还差 \(AttendanceCalculator.formatDuration(plan.remainingMinutes))，但已无剩余可打卡日期。")
+                            .foregroundStyle(.red)
+                    } else {
+                        Text(
+                            "还差 \(AttendanceCalculator.formatDuration(plan.remainingMinutes)) · 剩余 \(plan.eligibleDays) 个可打卡日"
+                        )
+                        .foregroundStyle(.secondary)
+                    }
+                }
+
+                Spacer()
+
+                Button {
+                    if store.todayRecord?.isSlacking == true {
+                        _ = store.setSlacking(on: .now, enabled: false)
+                    } else if store.requiresClearingBeforeSlacking(on: .now) {
+                        showClearConfirmation = true
+                    } else {
+                        _ = store.setSlacking(on: .now, enabled: true)
+                    }
+                } label: {
+                    Label(
+                        store.todayRecord?.isSlacking == true ? "取消今日摆烂" : "今天摆烂",
+                        systemImage: store.todayRecord?.isSlacking == true
+                            ? "arrow.uturn.backward"
+                            : "moon.zzz.fill"
+                    )
+                }
+                .tint(.purple)
+                .buttonStyle(.borderedProminent)
+            }
+        }
+        .confirmationDialog(
+            "今天已经存在打卡记录",
+            isPresented: $showClearConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("清空记录并摆烂", role: .destructive) {
+                _ = store.setSlacking(
+                    on: .now,
+                    enabled: true,
+                    clearExistingRecord: true
+                )
+            }
+            Button("取消", role: .cancel) {}
+        } message: {
+            Text("已有的上下班时间将被清空，可以通过反馈提示中的“撤销”恢复。")
+        }
     }
 }
 

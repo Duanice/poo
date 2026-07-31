@@ -22,7 +22,8 @@ struct DakaApp: App {
                 .environmentObject(store)
                 .modelContainer(modelContainer)
                 .frame(minWidth: 940, minHeight: 650)
-                .onOpenURL { _ in
+                .onOpenURL { url in
+                    store.handleDeepLink(url)
                     NSApp.activate(ignoringOtherApps: true)
                 }
         }

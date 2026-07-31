@@ -23,28 +23,43 @@ struct ContentView: View {
     @State private var selection: SidebarDestination? = .overview
 
     var body: some View {
-        NavigationSplitView {
-            List(SidebarDestination.allCases, selection: $selection) { item in
-                Label(item.rawValue, systemImage: item.icon)
-                    .tag(item)
-            }
-            .navigationTitle("打卡")
-            .navigationSplitViewColumnWidth(min: 180, ideal: 210)
-        } detail: {
-            Group {
-                switch selection ?? .overview {
-                case .overview:
-                    DashboardView()
-                case .history:
-                    HistoryView()
-                case .backup:
-                    BackupView()
-                case .settings:
-                    SettingsView()
+        ZStack(alignment: .topTrailing) {
+            NavigationSplitView {
+                List(SidebarDestination.allCases, selection: $selection) { item in
+                    Label(item.rawValue, systemImage: item.icon)
+                        .tag(item)
                 }
+                .navigationTitle("打卡")
+                .navigationSplitViewColumnWidth(min: 180, ideal: 210)
+            } detail: {
+                Group {
+                    switch selection ?? .overview {
+                    case .overview:
+                        DashboardView()
+                    case .history:
+                        HistoryView()
+                    case .backup:
+                        BackupView()
+                    case .settings:
+                        SettingsView()
+                    }
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(Color(nsColor: .windowBackgroundColor))
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Color(nsColor: .windowBackgroundColor))
+
+            if let feedback = store.feedback {
+                FeedbackBanner(feedback: feedback)
+                    .environmentObject(store)
+                    .padding(20)
+                    .transition(.move(edge: .top).combined(with: .opacity))
+                    .zIndex(10)
+            }
+        }
+        .animation(.snappy, value: store.feedback?.id)
+        .sheet(item: $store.editRequest) { request in
+            RecordEditorSheet(date: request.date)
+                .environmentObject(store)
         }
         .alert(
             "操作未完成",

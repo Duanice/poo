@@ -3,7 +3,7 @@ import SwiftUI
 struct HistoryView: View {
     @EnvironmentObject private var store: AttendanceStore
     @State private var selectedAnchor = Date.now
-    @State private var editingDay: DaySelection?
+    @State private var listExpanded = false
 
     private var period: AttendancePeriod {
         AttendancePeriodCalculator.period(containing: selectedAnchor)
@@ -55,75 +55,297 @@ struct HistoryView: View {
             }
             .padding(28)
 
-            HStack(spacing: 14) {
-                MetricTile(
-                    title: "周期累计",
-                    value: AttendanceCalculator.formatDuration(totalMinutes),
-                    icon: "clock.fill",
-                    color: .blue
-                )
-                MetricTile(
-                    title: "已记录天数",
-                    value: "\(periodRecords.filter(\.isComplete).count) 天",
-                    icon: "calendar.badge.checkmark",
-                    color: .green
-                )
-                MetricTile(
-                    title: "距目标",
-                    value: AttendanceCalculator.formatDuration(
-                        max(0, AppSettingsSnapshot.load().targetMinutes - totalMinutes)
-                    ),
-                    icon: "flag.checkered",
-                    color: .orange
-                )
-            }
-            .padding(.horizontal, 28)
-            .padding(.bottom, 18)
-
-            List(days, id: \.self) { day in
-                let record = store.record(on: day)
-                Button {
-                    editingDay = DaySelection(date: day)
-                } label: {
-                    DayRecordRow(day: day, record: record)
-                }
-                .buttonStyle(.plain)
-            }
-            .listStyle(.inset)
-        }
-        .sheet(item: $editingDay) { selection in
-            VStack(spacing: 0) {
-                HStack {
-                    Spacer()
-                    Button {
-                        editingDay = nil
-                    } label: {
-                        Label("关闭", systemImage: "xmark")
+            ScrollView {
+                VStack(spacing: 18) {
+                    HStack(spacing: 14) {
+                        MetricTile(
+                            title: "周期累计",
+                            value: AttendanceCalculator.formatDuration(totalMinutes),
+                            icon: "clock.fill",
+                            color: .blue
+                        )
+                        MetricTile(
+                            title: "已完成记录",
+                            value: "\(periodRecords.filter(\.isComplete).count) 天",
+                            icon: "calendar.badge.checkmark",
+                            color: .green
+                        )
+                        MetricTile(
+                            title: "摆烂日",
+                            value: "\(periodRecords.filter(\.isSlacking).count) 天",
+                            icon: "moon.zzz.fill",
+                            color: .purple
+                        )
+                        MetricTile(
+                            title: "距目标",
+                            value: AttendanceCalculator.formatDuration(
+                                max(0, AppSettingsSnapshot.load().targetMinutes - totalMinutes)
+                            ),
+                            icon: "flag.checkered",
+                            color: .orange
+                        )
                     }
-                    .keyboardShortcut(.cancelAction)
-                }
-                .padding(.horizontal, 24)
-                .padding(.top, 18)
 
-                ScrollView {
-                    TodayEditorView(
-                        workDate: selection.date,
-                        record: store.record(on: selection.date),
-                        title: "编辑打卡记录"
-                    )
-                    .id(store.changeToken)
-                    .padding(24)
+                    Card {
+                        CycleCalendarView(period: period)
+                    }
+
+                    Card {
+                        DisclosureGroup("列表视图", isExpanded: $listExpanded) {
+                            VStack(spacing: 0) {
+                                ForEach(days, id: \.self) { day in
+                                    let record = store.record(on: day)
+                                    Button {
+                                        store.openEditor(on: day)
+                                    } label: {
+                                        DayRecordRow(day: day, record: record)
+                                    }
+                                    .buttonStyle(.plain)
+                                    if day != days.last {
+                                        Divider()
+                                    }
+                                }
+                            }
+                            .padding(.top, 12)
+                        }
+                        .font(.headline)
+                    }
                 }
+                .padding(.horizontal, 28)
+                .padding(.bottom, 28)
             }
-            .environmentObject(store)
-            .frame(width: 700, height: 560)
         }
     }
 }
 
-private struct DaySelection: Identifiable {
+private struct CalendarDateSelection: Identifiable {
     let date: Date
     var id: TimeInterval { date.timeIntervalSinceReferenceDate }
+}
+
+struct CycleCalendarView: View {
+    @EnvironmentObject private var store: AttendanceStore
+    let period: AttendancePeriod
+    var compact = false
+
+    @State private var pendingSlackingDate: CalendarDateSelection?
+
+    private let weekdayNames = ["一", "二", "三", "四", "五", "六", "日"]
+    private let columns = Array(
+        repeating: GridItem(.flexible(minimum: 54), spacing: 8),
+        count: 7
+    )
+
+    private var gridDays: [Date?] {
+        let days = period.allDays()
+        guard let first = days.first else { return [] }
+        let weekday = Calendar.current.component(.weekday, from: first)
+        let leadingEmpty = (weekday + 5) % 7
+        var result = Array<Date?>(repeating: nil, count: leadingEmpty)
+        result.append(contentsOf: days.map(Optional.some))
+        let trailingEmpty = (7 - result.count % 7) % 7
+        result.append(contentsOf: Array(repeating: nil, count: trailingEmpty))
+        return result
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            HStack {
+                VStack(alignment: .leading, spacing: 3) {
+                    Text("周期日历")
+                        .font(.headline)
+                    Text("点击日期编辑，点击月亮图标一键设置摆烂")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+                CalendarLegend(color: .blue, text: "已完成")
+                CalendarLegend(color: .orange, text: "进行中")
+                CalendarLegend(color: .purple, text: "摆烂")
+            }
+
+            LazyVGrid(columns: columns, spacing: 8) {
+                ForEach(weekdayNames, id: \.self) { name in
+                    Text(name)
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity)
+                }
+
+                ForEach(Array(gridDays.enumerated()), id: \.offset) { _, day in
+                    if let day {
+                        CalendarDayCell(
+                            day: day,
+                            record: store.record(on: day),
+                            compact: compact,
+                            onOpen: {
+                                store.openEditor(on: day)
+                            },
+                            onToggleSlacking: {
+                                toggleSlacking(on: day)
+                            }
+                        )
+                    } else {
+                        Color.clear
+                            .frame(height: compact ? 62 : 82)
+                    }
+                }
+            }
+        }
+        .confirmationDialog(
+            "该日期已经存在打卡时间",
+            isPresented: Binding(
+                get: { pendingSlackingDate != nil },
+                set: { if !$0 { pendingSlackingDate = nil } }
+            ),
+            titleVisibility: .visible
+        ) {
+            Button("清空记录并摆烂", role: .destructive) {
+                if let date = pendingSlackingDate?.date {
+                    _ = store.setSlacking(
+                        on: date,
+                        enabled: true,
+                        clearExistingRecord: true
+                    )
+                }
+                pendingSlackingDate = nil
+            }
+            Button("取消", role: .cancel) {
+                pendingSlackingDate = nil
+            }
+        } message: {
+            Text("已有的上下班时间将被清空，可以通过反馈提示中的“撤销”恢复。")
+        }
+    }
+
+    private func toggleSlacking(on date: Date) {
+        if store.record(on: date)?.isSlacking == true {
+            _ = store.setSlacking(on: date, enabled: false)
+        } else if store.requiresClearingBeforeSlacking(on: date) {
+            pendingSlackingDate = CalendarDateSelection(date: date)
+        } else {
+            _ = store.setSlacking(on: date, enabled: true)
+        }
+    }
+}
+
+private struct CalendarLegend: View {
+    let color: Color
+    let text: String
+
+    var body: some View {
+        HStack(spacing: 4) {
+            Circle()
+                .fill(color)
+                .frame(width: 7, height: 7)
+            Text(text)
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+        }
+    }
+}
+
+private struct CalendarDayCell: View {
+    let day: Date
+    let record: AttendanceRecord?
+    let compact: Bool
+    let onOpen: () -> Void
+    let onToggleSlacking: () -> Void
+
+    private var backgroundColor: Color {
+        if record?.isSlacking == true {
+            return .purple.opacity(0.18)
+        }
+        if record?.isComplete == true {
+            let intensity = min(
+                max(Double(record?.durationMinutes ?? 0) / Double(12 * 60), 0.25),
+                1
+            )
+            return .blue.opacity(0.12 + intensity * 0.28)
+        }
+        if record?.checkIn != nil || record?.checkOut != nil {
+            return .orange.opacity(0.16)
+        }
+        return .secondary.opacity(0.06)
+    }
+
+    private var detail: String {
+        if record?.isSlacking == true {
+            return "摆烂"
+        }
+        if record?.isComplete == true {
+            return AttendanceCalculator.compactDuration(record?.durationMinutes ?? 0)
+        }
+        if record?.checkIn != nil || record?.checkOut != nil {
+            return "进行中"
+        }
+        return "未记录"
+    }
+
+    var body: some View {
+        ZStack(alignment: .topTrailing) {
+            Button(action: onOpen) {
+                VStack(alignment: .leading, spacing: compact ? 3 : 7) {
+                    HStack(alignment: .firstTextBaseline) {
+                        Text(dayLabel)
+                        .font(.subheadline.weight(.semibold).monospacedDigit())
+                        Spacer()
+                    }
+                    Spacer(minLength: 0)
+                    HStack(spacing: 4) {
+                        if record?.isSlacking == true {
+                            Image(systemName: "moon.zzz.fill")
+                        } else if record?.isComplete == true {
+                            Image(systemName: "checkmark.circle.fill")
+                        } else if record?.checkIn != nil || record?.checkOut != nil {
+                            Image(systemName: "clock.badge.exclamationmark")
+                        }
+                        Text(detail)
+                            .lineLimit(1)
+                    }
+                    .font(.caption2.weight(.medium))
+                    .foregroundStyle(record?.isSlacking == true ? .purple : .secondary)
+                    if !compact, record?.note.isEmpty == false {
+                        Image(systemName: "note.text")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                .padding(9)
+                .frame(maxWidth: .infinity, minHeight: compact ? 62 : 82, alignment: .leading)
+                .background(backgroundColor, in: RoundedRectangle(cornerRadius: 11))
+                .overlay {
+                    if Calendar.current.isDateInToday(day) {
+                        RoundedRectangle(cornerRadius: 11)
+                            .strokeBorder(.cyan, lineWidth: 2)
+                    }
+                }
+                .opacity(day > Date.now ? 0.72 : 1)
+            }
+            .buttonStyle(.plain)
+
+            Button(action: onToggleSlacking) {
+                Image(systemName: record?.isSlacking == true ? "moon.zzz.fill" : "moon.zzz")
+                    .font(.caption2)
+                    .foregroundStyle(.purple)
+                    .padding(7)
+            }
+            .buttonStyle(.plain)
+            .help(record?.isSlacking == true ? "取消摆烂" : "设为摆烂日")
+        }
+    }
+
+    private var dayLabel: String {
+        if Calendar.current.component(.day, from: day) == 1 {
+            return day.formatted(
+                .dateTime
+                    .month(.abbreviated)
+                    .day()
+                    .locale(Locale(identifier: "zh_CN"))
+            )
+        }
+        return day.formatted(.dateTime.day())
+    }
 }
 
 private struct MetricTile: View {

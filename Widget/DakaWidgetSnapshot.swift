@@ -10,10 +10,22 @@ struct DakaWidgetEntry: TimelineEntry {
     let todayMinutes: Int
     let todayCheckIn: Date?
     let todayCheckOut: Date?
+    let todayIsSlacking: Bool
+    let catchUpPlan: CatchUpPlan
+    let dailySummaries: [DailyAttendanceSummary]
     let loadError: Bool
 
     static var placeholder: DakaWidgetEntry {
         let period = AttendancePeriodCalculator.period(containing: .now)
+        let summaries = period.allDays().enumerated().map { index, date in
+            DailyAttendanceSummary(
+                date: date,
+                durationMinutes: index < 10 ? (6 + index % 5) * 60 : 0,
+                isComplete: index < 10,
+                isPartial: index == 10,
+                isSlacking: index == 11 || index == 14
+            )
+        }
         return DakaWidgetEntry(
             date: .now,
             period: period,
@@ -22,6 +34,15 @@ struct DakaWidgetEntry: TimelineEntry {
             todayMinutes: 8 * 60,
             todayCheckIn: AttendanceCalculator.date(on: .now, minuteOfDay: 10 * 60),
             todayCheckOut: AttendanceCalculator.date(on: .now, minuteOfDay: 18 * 60),
+            todayIsSlacking: false,
+            catchUpPlan: CatchUpPlan(
+                completedMinutes: 92 * 60 + 30,
+                remainingMinutes: 67 * 60 + 30,
+                eligibleDays: 8,
+                requiredMinutesPerDay: 507,
+                loadLevel: .normal
+            ),
+            dailySummaries: summaries,
             loadError: false
         )
     }
@@ -43,19 +64,30 @@ enum DakaWidgetSnapshotLoader {
                 }
             )
             let records = try context.fetch(descriptor)
+            let summaries = AttendanceSummaryBuilder.make(
+                period: period,
+                records: records
+            )
             let today = records.first {
                 Calendar.autoupdatingCurrent.isDate($0.workDate, inSameDayAs: now)
             }
+            let plan = CatchUpPlanCalculator.plan(
+                period: period,
+                summaries: summaries,
+                targetMinutes: settings.targetMinutes,
+                now: now
+            )
             return DakaWidgetEntry(
                 date: now,
                 period: period,
-                completedMinutes: records
-                    .filter { $0.workDate <= now }
-                    .reduce(0) { $0 + $1.durationMinutes },
+                completedMinutes: plan.completedMinutes,
                 targetMinutes: settings.targetMinutes,
                 todayMinutes: today?.durationMinutes ?? 0,
                 todayCheckIn: today?.checkIn,
                 todayCheckOut: today?.checkOut,
+                todayIsSlacking: today?.isSlacking ?? false,
+                catchUpPlan: plan,
+                dailySummaries: summaries,
                 loadError: false
             )
         } catch {
@@ -67,6 +99,15 @@ enum DakaWidgetSnapshotLoader {
                 todayMinutes: 0,
                 todayCheckIn: nil,
                 todayCheckOut: nil,
+                todayIsSlacking: false,
+                catchUpPlan: CatchUpPlan(
+                    completedMinutes: 0,
+                    remainingMinutes: settings.targetMinutes,
+                    eligibleDays: 0,
+                    requiredMinutesPerDay: 0,
+                    loadLevel: .impossible
+                ),
+                dailySummaries: [],
                 loadError: true
             )
         }

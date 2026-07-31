@@ -59,6 +59,29 @@ struct DomainSmokeTests {
         )
         precondition(AttendanceCalculator.formatDuration(755) == "12 小时 35 分")
 
+        let catchUpPeriod = AttendancePeriod(
+            start: calendar.startOfDay(for: date(2026, 8, 20)),
+            endExclusive: calendar.startOfDay(for: date(2026, 8, 25))
+        )
+        let summaries = catchUpPeriod.allDays(calendar: calendar).map {
+            DailyAttendanceSummary(
+                date: $0,
+                durationMinutes: 0,
+                isComplete: false,
+                isPartial: false,
+                isSlacking: false
+            )
+        }
+        let catchUpPlan = CatchUpPlanCalculator.plan(
+            period: catchUpPeriod,
+            summaries: summaries,
+            targetMinutes: 40 * 60,
+            now: date(2026, 8, 20),
+            calendar: calendar
+        )
+        precondition(catchUpPlan.eligibleDays == 5)
+        precondition(catchUpPlan.requiredMinutesPerDay == 8 * 60)
+
         print("Domain smoke tests passed")
     }
 }

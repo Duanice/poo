@@ -3,14 +3,43 @@ import Foundation
 import SwiftData
 import WidgetKit
 
+enum FeedbackStyle {
+    case success
+    case information
+    case warning
+    case failure
+}
+
+struct AppFeedback: Identifiable {
+    let id = UUID()
+    let title: String
+    let detail: String?
+    let style: FeedbackStyle
+    let actionTitle: String?
+}
+
+struct RecordEditRequest: Identifiable {
+    let id = UUID()
+    let date: Date
+}
+
+private struct UndoRecordSnapshot {
+    let date: Date
+    let record: BackupRecord?
+}
+
 @MainActor
 final class AttendanceStore: ObservableObject {
     @Published private(set) var records: [AttendanceRecord] = []
     @Published private(set) var changeToken = UUID()
     @Published var errorMessage: String?
+    @Published var feedback: AppFeedback?
+    @Published var editRequest: RecordEditRequest?
 
     let modelContext: ModelContext
     private let calendar: Calendar
+    private var pendingUndo: UndoRecordSnapshot?
+    private var feedbackTask: Task<Void, Never>?
 
     init(modelContainer: ModelContainer, calendar: Calendar = .autoupdatingCurrent) {
         self.modelContext = ModelContext(modelContainer)
@@ -28,10 +57,24 @@ final class AttendanceStore: ObservableObject {
     }
 
     var currentTotalMinutes: Int {
-        let now = Date.now
-        return currentPeriodRecords
-            .filter { $0.workDate <= now }
-            .reduce(0) { $0 + $1.durationMinutes }
+        currentCatchUpPlan.completedMinutes
+    }
+
+    var currentCatchUpPlan: CatchUpPlan {
+        CatchUpPlanCalculator.plan(
+            period: currentPeriod,
+            summaries: currentDailySummaries,
+            targetMinutes: AppSettingsSnapshot.load().targetMinutes,
+            calendar: calendar
+        )
+    }
+
+    var currentDailySummaries: [DailyAttendanceSummary] {
+        AttendanceSummaryBuilder.make(
+            period: currentPeriod,
+            records: records,
+            calendar: calendar
+        )
     }
 
     var todayRecord: AttendanceRecord? {
@@ -65,13 +108,18 @@ final class AttendanceStore: ObservableObject {
     ) -> Bool {
         do {
             let service = AttendanceMutationService(context: modelContext, calendar: calendar)
-            try service.save(
+            let saved = try service.save(
                 workDate: workDate,
                 checkIn: checkIn,
                 checkOut: checkOut,
                 note: note
             )
             didMutate()
+            presentFeedback(
+                title: "\(DakaFormatters.shortDay(workDate)) 记录已保存",
+                detail: "当日 \(AttendanceCalculator.formatDuration(saved.durationMinutes))",
+                style: .success
+            )
             return true
         } catch {
             errorMessage = error.localizedDescription
@@ -86,6 +134,11 @@ final class AttendanceStore: ObservableObject {
                 calendar: calendar
             ).checkInNow()
             didMutate()
+            presentFeedback(
+                title: "上班时间已记录",
+                detail: DakaFormatters.time(record(on: .now)?.checkIn),
+                style: .success
+            )
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -98,6 +151,12 @@ final class AttendanceStore: ObservableObject {
                 calendar: calendar
             ).checkOutNow()
             didMutate()
+            let today = record(on: .now)
+            presentFeedback(
+                title: "下班时间已记录",
+                detail: "今日 \(AttendanceCalculator.formatDuration(today?.durationMinutes ?? 0))",
+                style: .success
+            )
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -105,13 +164,136 @@ final class AttendanceStore: ObservableObject {
 
     func delete(on date: Date) {
         do {
+            let snapshot = record(on: date).map(BackupRecord.init)
+            pendingUndo = UndoRecordSnapshot(date: date, record: snapshot)
             try AttendanceMutationService(
                 context: modelContext,
                 calendar: calendar
             ).delete(on: date)
             didMutate()
+            presentFeedback(
+                title: "\(DakaFormatters.shortDay(date)) 记录已删除",
+                style: .warning,
+                actionTitle: "撤销",
+                duration: 6
+            )
         } catch {
             errorMessage = "删除失败：\(error.localizedDescription)"
+        }
+    }
+
+    func requiresClearingBeforeSlacking(on date: Date) -> Bool {
+        guard let item = record(on: date), !item.isSlacking else {
+            return false
+        }
+        return item.checkIn != nil || item.checkOut != nil
+    }
+
+    @discardableResult
+    func setSlacking(
+        on date: Date,
+        enabled: Bool,
+        clearExistingRecord: Bool = false
+    ) -> Bool {
+        do {
+            pendingUndo = UndoRecordSnapshot(
+                date: date,
+                record: record(on: date).map(BackupRecord.init)
+            )
+            try AttendanceMutationService(
+                context: modelContext,
+                calendar: calendar
+            ).setSlacking(
+                on: date,
+                enabled: enabled,
+                clearExistingRecord: clearExistingRecord
+            )
+            didMutate()
+            let plan = currentCatchUpPlan
+            let detail: String
+            if plan.isCompleted {
+                detail = "本周期目标已完成"
+            } else if plan.isImpossible {
+                detail = "本周期已无剩余可打卡日期"
+            } else {
+                detail = "剩余 \(plan.eligibleDays) 天，每天需要 \(AttendanceCalculator.formatDuration(plan.requiredMinutesPerDay))"
+            }
+            presentFeedback(
+                title: enabled
+                    ? "\(DakaFormatters.shortDay(date)) 已设为摆烂日"
+                    : "已取消 \(DakaFormatters.shortDay(date)) 摆烂状态",
+                detail: detail,
+                style: enabled ? .information : .success,
+                actionTitle: "撤销",
+                duration: 6
+            )
+            return true
+        } catch {
+            pendingUndo = nil
+            errorMessage = error.localizedDescription
+            return false
+        }
+    }
+
+    func undoLastChange() {
+        guard let pendingUndo else { return }
+        do {
+            try AttendanceMutationService(
+                context: modelContext,
+                calendar: calendar
+            ).delete(on: pendingUndo.date)
+            if let snapshot = pendingUndo.record {
+                modelContext.insert(
+                    AttendanceRecord(
+                        id: snapshot.id,
+                        workDate: snapshot.workDate,
+                        checkIn: snapshot.checkIn,
+                        checkOut: snapshot.checkOut,
+                        note: snapshot.note,
+                        isSlacking: snapshot.isSlacking ?? false,
+                        createdAt: snapshot.createdAt,
+                        updatedAt: snapshot.updatedAt
+                    )
+                )
+                try modelContext.save()
+            }
+            self.pendingUndo = nil
+            didMutate()
+            presentFeedback(title: "操作已撤销", style: .success)
+        } catch {
+            errorMessage = "撤销失败：\(error.localizedDescription)"
+        }
+    }
+
+    func dismissFeedback() {
+        feedbackTask?.cancel()
+        feedback = nil
+    }
+
+    func openEditor(on date: Date) {
+        editRequest = RecordEditRequest(date: calendar.startOfDay(for: date))
+    }
+
+    func handleDeepLink(_ url: URL) {
+        switch url.host {
+        case "today":
+            openEditor(on: .now)
+        case "record":
+            let value = url.path.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
+            let components = value.split(separator: "-").compactMap { Int($0) }
+            guard components.count == 3,
+                  let date = calendar.date(
+                    from: DateComponents(
+                        year: components[0],
+                        month: components[1],
+                        day: components[2]
+                    )
+                  ) else {
+                return
+            }
+            openEditor(on: date)
+        default:
+            break
         }
     }
 
@@ -126,6 +308,7 @@ final class AttendanceStore: ObservableObject {
                     checkIn: item.checkIn,
                     checkOut: item.checkOut,
                     note: item.note,
+                    isSlacking: item.isSlacking ?? false,
                     createdAt: item.createdAt,
                     updatedAt: item.updatedAt
                 )
@@ -133,10 +316,36 @@ final class AttendanceStore: ObservableObject {
         }
         try modelContext.save()
         didMutate()
+        presentFeedback(
+            title: "备份恢复完成",
+            detail: "已恢复 \(items.count) 条记录",
+            style: .success
+        )
     }
 
     private func didMutate() {
         refresh()
         WidgetCenter.shared.reloadTimelines(ofKind: AppConstants.widgetKind)
+    }
+
+    private func presentFeedback(
+        title: String,
+        detail: String? = nil,
+        style: FeedbackStyle,
+        actionTitle: String? = nil,
+        duration: Double = 2.5
+    ) {
+        feedbackTask?.cancel()
+        feedback = AppFeedback(
+            title: title,
+            detail: detail,
+            style: style,
+            actionTitle: actionTitle
+        )
+        feedbackTask = Task { [weak self] in
+            try? await Task.sleep(for: .seconds(duration))
+            guard !Task.isCancelled else { return }
+            self?.feedback = nil
+        }
     }
 }

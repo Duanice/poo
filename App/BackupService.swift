@@ -9,6 +9,7 @@ struct BackupRecord: Codable, Sendable {
     let checkIn: Date?
     let checkOut: Date?
     let note: String
+    let isSlacking: Bool?
     let createdAt: Date
     let updatedAt: Date
 
@@ -18,6 +19,7 @@ struct BackupRecord: Codable, Sendable {
         checkIn = record.checkIn
         checkOut = record.checkOut
         note = record.note
+        isSlacking = record.isSlacking
         createdAt = record.createdAt
         updatedAt = record.updatedAt
     }
@@ -30,7 +32,7 @@ struct BackupEnvelope: Codable, Sendable {
     let records: [BackupRecord]
 
     init(records: [AttendanceRecord]) {
-        formatVersion = 1
+        formatVersion = 2
         exportedAt = .now
         appName = "中关村实验室打卡 for 段冰洁"
         self.records = records.map(BackupRecord.init)
@@ -49,18 +51,19 @@ enum BackupService {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
         let envelope = try decoder.decode(BackupEnvelope.self, from: data)
-        guard envelope.formatVersion == 1 else {
+        guard envelope.formatVersion == 1 || envelope.formatVersion == 2 else {
             throw BackupError.unsupportedVersion(envelope.formatVersion)
         }
         return envelope
     }
 
     static func csvData(records: [AttendanceRecord]) -> Data {
-        var lines = ["日期,上班时间,下班时间,当日时长（分钟）,当日时长,状态,备注"]
+        var lines = ["日期,日期状态,上班时间,下班时间,当日时长（分钟）,当日时长,记录状态,备注"]
         let ordered = records.sorted { $0.workDate < $1.workDate }
         for record in ordered {
             let columns = [
                 record.workDate.formatted(.iso8601.year().month().day()),
+                record.isSlacking ? "摆烂日" : "普通日期",
                 DakaFormatters.time(record.checkIn),
                 DakaFormatters.time(record.checkOut),
                 String(record.durationMinutes),
