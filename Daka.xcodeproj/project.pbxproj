@@ -27,6 +27,7 @@
 		90E587D0C2C5F4DE0E9E3C8B /* AppDataContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A2C54B62E0FBB5822D6B9B6 /* AppDataContainer.swift */; };
 		92B80C9BBC2F3E594290ABED /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90D00CCE03CB4F7892B531EF /* HistoryView.swift */; };
 		986E180CA8F790DB19912CB8 /* DakaWidgetSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D5F476593A00D936C37E167 /* DakaWidgetSnapshot.swift */; };
+		9B61A8D6EFB24C118EEC9A01 /* WidgetSnapshotStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A3B4E5F61748299A0BCD12 /* WidgetSnapshotStore.swift */; };
 		A1BC9DF89D73EF5253346FDB /* AttendanceMutationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E1399407E0F8CEE0ED215D1 /* AttendanceMutationService.swift */; };
 		A748360E7935D2B7571BDEFD /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 950D60AA145141709C93720A /* NotificationService.swift */; };
 		A7DFA894642E260ECB578A1F /* AppConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5776D6547FBDFE213CC2C57 /* AppConstants.swift */; };
@@ -40,6 +41,7 @@
 		E86A4EFC4C67C54511E3C40E /* AttendanceCalculatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 402B8AC9AD077B7B4B826385 /* AttendanceCalculatorTests.swift */; };
 		F03E53E1232F712E8D09E4AA /* AttendanceRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17CB3B7B2AD2289B8E65AA2E /* AttendanceRecord.swift */; };
 		F4B86416198CFD9B9D5E3415 /* AttendanceRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17CB3B7B2AD2289B8E65AA2E /* AttendanceRecord.swift */; };
+		F6D7E8A901B24354A6C7D8E9 /* WidgetSnapshotStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A3B4E5F61748299A0BCD12 /* WidgetSnapshotStore.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -101,6 +103,7 @@
 		96C59B039D1F9EA146974847 /* DakaWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DakaWidget.swift; sourceTree = "<group>"; };
 		A2A5CD8266D3E6E97DED0AD1 /* AttendanceStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttendanceStore.swift; sourceTree = "<group>"; };
 		B15C37FB28D1D88EA5A70FDC /* BackupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupView.swift; sourceTree = "<group>"; };
+		C5A3B4E5F61748299A0BCD12 /* WidgetSnapshotStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetSnapshotStore.swift; sourceTree = "<group>"; };
 		CD8B89274E0C594EFC079520 /* AttendanceMutationServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttendanceMutationServiceTests.swift; sourceTree = "<group>"; };
 		D5776D6547FBDFE213CC2C57 /* AppConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConstants.swift; sourceTree = "<group>"; };
 		E8AFB5149EF7995766580060 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
@@ -118,6 +121,7 @@
 				5E1399407E0F8CEE0ED215D1 /* AttendanceMutationService.swift */,
 				6C99CF4AAD1A6B4B5A3F941B /* AttendancePeriod.swift */,
 				17CB3B7B2AD2289B8E65AA2E /* AttendanceRecord.swift */,
+				C5A3B4E5F61748299A0BCD12 /* WidgetSnapshotStore.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -271,11 +275,9 @@
 				LastUpgradeCheck = 2600;
 				TargetAttributes = {
 					197355D44C2DACC5DE047BEE = {
-						DevelopmentTeam = "";
 						ProvisioningStyle = Automatic;
 					};
 					64A499F70F186C6F40D77D51 = {
-						DevelopmentTeam = "";
 						ProvisioningStyle = Automatic;
 					};
 					95F37E29C35A478DC61ED9D7 = {
@@ -327,6 +329,7 @@
 				A1BC9DF89D73EF5253346FDB /* AttendanceMutationService.swift in Sources */,
 				8E1B0C378355FFD59B7E3E91 /* AttendancePeriod.swift in Sources */,
 				F03E53E1232F712E8D09E4AA /* AttendanceRecord.swift in Sources */,
+				9B61A8D6EFB24C118EEC9A01 /* WidgetSnapshotStore.swift in Sources */,
 				D6180EEFA187D9FF39F2B499 /* DakaWidget.swift in Sources */,
 				986E180CA8F790DB19912CB8 /* DakaWidgetSnapshot.swift in Sources */,
 				49B3F829E4A667B6F09598B2 /* QuickAttendanceIntents.swift in Sources */,
@@ -353,6 +356,7 @@
 				D64E7712396E579D5BAD095E /* AttendanceMutationService.swift in Sources */,
 				D432CF236D6AB914CB654172 /* AttendancePeriod.swift in Sources */,
 				F4B86416198CFD9B9D5E3415 /* AttendanceRecord.swift in Sources */,
+				F6D7E8A901B24354A6C7D8E9 /* WidgetSnapshotStore.swift in Sources */,
 				3508447C5189AE42A5C00E81 /* AttendanceStore.swift in Sources */,
 				0C75EEB03C00776DB6FFEBC4 /* BackupService.swift in Sources */,
 				AAF6FBD4577B14F5E16E0334 /* BackupView.swift in Sources */,
@@ -391,6 +395,7 @@
 				APPLICATION_EXTENSION_API_ONLY = YES;
 				CODE_SIGN_ENTITLEMENTS = Widget/DakaWidget.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 22KH5PW5F7;
 				INFOPLIST_FILE = Widget/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -409,6 +414,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 22KH5PW5F7;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -427,6 +433,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = App/Daka.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 22KH5PW5F7;
 				INFOPLIST_FILE = App/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "中关村实验室打卡 for 段冰洁";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
@@ -445,6 +452,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 22KH5PW5F7;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -463,6 +471,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = App/Daka.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 22KH5PW5F7;
 				INFOPLIST_FILE = App/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "中关村实验室打卡 for 段冰洁";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
@@ -482,6 +491,7 @@
 				APPLICATION_EXTENSION_API_ONLY = YES;
 				CODE_SIGN_ENTITLEMENTS = Widget/DakaWidget.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 22KH5PW5F7;
 				INFOPLIST_FILE = Widget/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

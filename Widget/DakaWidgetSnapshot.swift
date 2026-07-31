@@ -1,5 +1,4 @@
 import Foundation
-import SwiftData
 import WidgetKit
 
 struct DakaWidgetEntry: TimelineEntry {
@@ -50,38 +49,44 @@ struct DakaWidgetEntry: TimelineEntry {
 
 enum DakaWidgetSnapshotLoader {
     static func load(at now: Date = .now) -> DakaWidgetEntry {
-        let settings = AppSettingsSnapshot.load()
         let period = AttendancePeriodCalculator.period(containing: now)
+        let calendar = Calendar.autoupdatingCurrent
 
         do {
-            let container = try AppDataContainer.make()
-            let context = ModelContext(container)
-            let start = period.start
-            let end = period.endExclusive
-            let descriptor = FetchDescriptor<AttendanceRecord>(
-                predicate: #Predicate { record in
-                    record.workDate >= start && record.workDate < end
+            let snapshot = try WidgetSnapshotStore.load()
+            let records = snapshot.records.filter {
+                period.contains($0.workDate)
+            }
+            let summaries = period.allDays(calendar: calendar).map { day in
+                let record = records.first {
+                    calendar.isDate($0.workDate, inSameDayAs: day)
                 }
-            )
-            let records = try context.fetch(descriptor)
-            let summaries = AttendanceSummaryBuilder.make(
-                period: period,
-                records: records
-            )
+                return DailyAttendanceSummary(
+                    date: day,
+                    durationMinutes: record?.durationMinutes ?? 0,
+                    isComplete: record?.isComplete ?? false,
+                    isPartial: record != nil
+                        && record?.isSlacking != true
+                        && record?.isComplete != true
+                        && (record?.checkIn != nil || record?.checkOut != nil),
+                    isSlacking: record?.isSlacking ?? false
+                )
+            }
             let today = records.first {
-                Calendar.autoupdatingCurrent.isDate($0.workDate, inSameDayAs: now)
+                calendar.isDate($0.workDate, inSameDayAs: now)
             }
             let plan = CatchUpPlanCalculator.plan(
                 period: period,
                 summaries: summaries,
-                targetMinutes: settings.targetMinutes,
-                now: now
+                targetMinutes: snapshot.targetMinutes,
+                now: now,
+                calendar: calendar
             )
             return DakaWidgetEntry(
                 date: now,
                 period: period,
                 completedMinutes: plan.completedMinutes,
-                targetMinutes: settings.targetMinutes,
+                targetMinutes: snapshot.targetMinutes,
                 todayMinutes: today?.durationMinutes ?? 0,
                 todayCheckIn: today?.checkIn,
                 todayCheckOut: today?.checkOut,
@@ -95,14 +100,14 @@ enum DakaWidgetSnapshotLoader {
                 date: now,
                 period: period,
                 completedMinutes: 0,
-                targetMinutes: settings.targetMinutes,
+                targetMinutes: AppConstants.defaultTargetMinutes,
                 todayMinutes: 0,
                 todayCheckIn: nil,
                 todayCheckOut: nil,
                 todayIsSlacking: false,
                 catchUpPlan: CatchUpPlan(
                     completedMinutes: 0,
-                    remainingMinutes: settings.targetMinutes,
+                    remainingMinutes: AppConstants.defaultTargetMinutes,
                     eligibleDays: 0,
                     requiredMinutesPerDay: 0,
                     loadLevel: .impossible

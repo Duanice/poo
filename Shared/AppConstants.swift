@@ -30,7 +30,7 @@ struct AppSettingsSnapshot: Sendable, Equatable {
     var checkOutReminderMinute: Int
 
     static func load() -> AppSettingsSnapshot {
-        let defaults = UserDefaults(suiteName: AppConstants.appGroupIdentifier) ?? .standard
+        let defaults = UserDefaults.standard
         defaults.register(defaults: [
             SettingsKeys.targetMinutes: AppConstants.defaultTargetMinutes,
             SettingsKeys.defaultStartMinute: AppConstants.defaultStartMinute,
@@ -52,7 +52,7 @@ struct AppSettingsSnapshot: Sendable, Equatable {
     }
 
     func save() {
-        let defaults = UserDefaults(suiteName: AppConstants.appGroupIdentifier) ?? .standard
+        let defaults = UserDefaults.standard
         defaults.set(targetMinutes, forKey: SettingsKeys.targetMinutes)
         defaults.set(defaultStartMinute, forKey: SettingsKeys.defaultStartMinute)
         defaults.set(defaultEndMinute, forKey: SettingsKeys.defaultEndMinute)

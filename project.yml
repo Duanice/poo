@@ -12,7 +12,7 @@ settings:
     SWIFT_VERSION: "6.0"
     OTHER_SWIFT_FLAGS: "$(inherited) -disable-sandbox"
     MACOSX_DEPLOYMENT_TARGET: "14.0"
-    DEVELOPMENT_TEAM: ""
+    DEVELOPMENT_TEAM: 22KH5PW5F7
     CODE_SIGN_STYLE: Automatic
     CLANG_ENABLE_MODULES: YES
     ENABLE_HARDENED_RUNTIME: YES
@@ -39,8 +39,8 @@ targets:
       properties:
         CFBundleName: Daka
         CFBundleDisplayName: "中关村实验室打卡 for 段冰洁"
-        CFBundleShortVersionString: "1.1.1"
-        CFBundleVersion: "3"
+        CFBundleShortVersionString: "1.1.2"
+        CFBundleVersion: "4"
         LSMinimumSystemVersion: "14.0"
         NSHumanReadableCopyright: "Copyright © 2026 Duanice."
         CFBundleURLTypes:
@@ -69,8 +69,8 @@ targets:
       path: Widget/Info.plist
       properties:
         CFBundleDisplayName: "中关村实验室打卡"
-        CFBundleShortVersionString: "1.1.1"
-        CFBundleVersion: "3"
+        CFBundleShortVersionString: "1.1.2"
+        CFBundleVersion: "4"
         NSExtension:
           NSExtensionPointIdentifier: com.apple.widgetkit-extension
 

@@ -97,6 +97,17 @@ final class AttendanceStore: ObservableObject {
             changeToken = UUID()
         } catch {
             errorMessage = "读取打卡记录失败：\(error.localizedDescription)"
+            return
+        }
+
+        do {
+            try WidgetSnapshotStore.write(
+                records: records,
+                settings: AppSettingsSnapshot.load()
+            )
+            WidgetCenter.shared.reloadTimelines(ofKind: AppConstants.widgetKind)
+        } catch {
+            errorMessage = "桌面组件数据同步失败：\(error.localizedDescription)"
         }
     }
 
@@ -295,6 +306,19 @@ final class AttendanceStore: ObservableObject {
                 return
             }
             openEditor(on: date)
+        case "quick":
+            switch url.path {
+            case "/check-in":
+                checkInNow()
+            case "/check-out":
+                checkOutNow()
+            case "/toggle-slacking":
+                toggleTodaySlackingFromWidget()
+            default:
+                break
+            }
+        case "sync":
+            refresh()
         default:
             break
         }
@@ -328,7 +352,23 @@ final class AttendanceStore: ObservableObject {
 
     private func didMutate() {
         refresh()
-        WidgetCenter.shared.reloadTimelines(ofKind: AppConstants.widgetKind)
+    }
+
+    private func toggleTodaySlackingFromWidget() {
+        if todayRecord?.isSlacking == true {
+            setSlacking(on: .now, enabled: false)
+            return
+        }
+        if requiresClearingBeforeSlacking(on: .now) {
+            openEditor(on: .now)
+            presentFeedback(
+                title: "今天已有打卡记录",
+                detail: "请在编辑页确认清空记录后再设为摆烂日",
+                style: .warning
+            )
+            return
+        }
+        setSlacking(on: .now, enabled: true)
     }
 
     private func presentFeedback(

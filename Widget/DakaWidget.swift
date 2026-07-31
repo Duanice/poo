@@ -36,14 +36,37 @@ private struct DakaWidgetView: View {
     }
 
     var body: some View {
-        switch family {
-        case .systemSmall:
-            smallBody
-        case .systemMedium:
-            mediumBody
-        default:
-            largeBody
+        if entry.loadError {
+            snapshotErrorBody
+        } else {
+            switch family {
+            case .systemSmall:
+                smallBody
+            case .systemMedium:
+                mediumBody
+            default:
+                largeBody
+            }
         }
+    }
+
+    private var snapshotErrorBody: some View {
+        Link(destination: URL(string: "daka://sync")!) {
+            VStack(alignment: .leading, spacing: 10) {
+                Label("打卡数据待同步", systemImage: "arrow.triangle.2.circlepath")
+                    .font(.headline)
+                Text("打开一次主应用即可恢复桌面组件数据。")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                Spacer(minLength: 0)
+                Label("打开主应用", systemImage: "arrow.up.forward.app")
+                    .font(.caption.bold())
+                    .foregroundStyle(.cyan)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+        }
+        .foregroundStyle(.white)
     }
 
     private var smallBody: some View {
@@ -137,17 +160,17 @@ private struct DakaWidgetView: View {
                     .lineLimit(1)
 
                 HStack(spacing: 6) {
-                    Button(intent: QuickCheckInIntent()) {
+                    Link(destination: URL(string: "daka://quick/check-in")!) {
                         Label("上班", systemImage: "play.fill")
                     }
                     .buttonStyle(.bordered)
 
-                    Button(intent: QuickCheckOutIntent()) {
+                    Link(destination: URL(string: "daka://quick/check-out")!) {
                         Label("下班", systemImage: "stop.fill")
                     }
                     .buttonStyle(.borderedProminent)
 
-                    Button(intent: ToggleTodaySlackingIntent()) {
+                    Link(destination: URL(string: "daka://quick/toggle-slacking")!) {
                         Image(systemName: entry.todayIsSlacking ? "arrow.uturn.backward" : "moon.zzz.fill")
                     }
                     .buttonStyle(.bordered)
@@ -209,13 +232,13 @@ private struct DakaWidgetView: View {
                 Spacer()
 
                 HStack(spacing: 8) {
-                    Button(intent: QuickCheckInIntent()) {
+                    Link(destination: URL(string: "daka://quick/check-in")!) {
                         Label("上班", systemImage: "play.fill")
                     }
-                    Button(intent: QuickCheckOutIntent()) {
+                    Link(destination: URL(string: "daka://quick/check-out")!) {
                         Label("下班", systemImage: "stop.fill")
                     }
-                    Button(intent: ToggleTodaySlackingIntent()) {
+                    Link(destination: URL(string: "daka://quick/toggle-slacking")!) {
                         Label(
                             entry.todayIsSlacking ? "取消摆烂" : "摆烂",
                             systemImage: entry.todayIsSlacking ? "arrow.uturn.backward" : "moon.zzz.fill"
