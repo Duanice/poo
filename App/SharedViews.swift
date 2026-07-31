@@ -137,7 +137,10 @@ struct RecordEditorSheet: View {
                 TodayEditorView(
                     workDate: date,
                     record: store.record(on: date),
-                    title: "编辑打卡记录"
+                    title: "编辑打卡记录",
+                    onFinished: {
+                        store.editRequest = nil
+                    }
                 )
                 .id(store.changeToken)
                 .padding(24)

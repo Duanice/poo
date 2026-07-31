@@ -162,7 +162,8 @@ final class AttendanceStore: ObservableObject {
         }
     }
 
-    func delete(on date: Date) {
+    @discardableResult
+    func delete(on date: Date) -> Bool {
         do {
             let snapshot = record(on: date).map(BackupRecord.init)
             pendingUndo = UndoRecordSnapshot(date: date, record: snapshot)
@@ -177,8 +178,10 @@ final class AttendanceStore: ObservableObject {
                 actionTitle: "撤销",
                 duration: 6
             )
+            return true
         } catch {
             errorMessage = "删除失败：\(error.localizedDescription)"
+            return false
         }
     }
 

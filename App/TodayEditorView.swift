@@ -6,6 +6,7 @@ struct TodayEditorView: View {
     let workDate: Date
     let record: AttendanceRecord?
     let title: String
+    let onFinished: (() -> Void)?
 
     @State private var hasCheckIn: Bool
     @State private var hasCheckOut: Bool
@@ -17,10 +18,16 @@ struct TodayEditorView: View {
     @State private var showDeleteConfirmation = false
     @State private var showSlackingConfirmation = false
 
-    init(workDate: Date, record: AttendanceRecord?, title: String) {
+    init(
+        workDate: Date,
+        record: AttendanceRecord?,
+        title: String,
+        onFinished: (() -> Void)? = nil
+    ) {
         self.workDate = workDate
         self.record = record
         self.title = title
+        self.onFinished = onFinished
 
         let settings = AppSettingsSnapshot.load()
         let defaultCheckIn = AttendanceCalculator.date(
@@ -159,7 +166,9 @@ struct TodayEditorView: View {
                             if store.requiresClearingBeforeSlacking(on: workDate) {
                                 showSlackingConfirmation = true
                             } else {
-                                _ = store.setSlacking(on: workDate, enabled: true)
+                                if store.setSlacking(on: workDate, enabled: true) {
+                                    onFinished?()
+                                }
                             }
                         }
                         .tint(.purple)
@@ -203,7 +212,9 @@ struct TodayEditorView: View {
             titleVisibility: .visible
         ) {
             Button("删除记录", role: .destructive) {
-                store.delete(on: workDate)
+                if store.delete(on: workDate) {
+                    onFinished?()
+                }
             }
             Button("取消", role: .cancel) {}
         }
@@ -213,11 +224,13 @@ struct TodayEditorView: View {
             titleVisibility: .visible
         ) {
             Button("清空记录并摆烂", role: .destructive) {
-                _ = store.setSlacking(
+                if store.setSlacking(
                     on: workDate,
                     enabled: true,
                     clearExistingRecord: true
-                )
+                ) {
+                    onFinished?()
+                }
             }
             Button("取消", role: .cancel) {}
         } message: {
@@ -235,6 +248,7 @@ struct TodayEditorView: View {
             withAnimation {
                 savedMessage = "已保存"
             }
+            onFinished?()
             Task {
                 try? await Task.sleep(for: .seconds(2))
                 await MainActor.run {
