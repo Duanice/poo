@@ -1,0 +1,31 @@
+# Xcode
+DerivedData/
+build/
+*.xcuserstate
+xcuserdata/
+*.xccheckout
+*.xcscmblueprint
+
+# Swift Package Manager
+.build/
+.swiftpm/
+
+# macOS
+.DS_Store
+
+# Signing and private data
+*.p12
+*.cer
+*.provisionprofile
+*.mobileprovision
+
+# Personal attendance data and exports
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+Exports/
+Backups/
+*.daka-backup.json
+
+# Generated local settings
+local.xcconfig

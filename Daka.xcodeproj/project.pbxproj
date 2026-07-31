@@ -1,0 +1,667 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0C75EEB03C00776DB6FFEBC4 /* BackupService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76116D84FD4EA18548862AAE /* BackupService.swift */; };
+		16CEBA15388CDD33BEF28CEF /* AttendanceCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2398F7623B1F6F3CF8F9A3C5 /* AttendanceCalculator.swift */; };
+		2F881FDFF2ECDCCE48DF2B38 /* AttendanceCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2398F7623B1F6F3CF8F9A3C5 /* AttendanceCalculator.swift */; };
+		3508447C5189AE42A5C00E81 /* AttendanceStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2A5CD8266D3E6E97DED0AD1 /* AttendanceStore.swift */; };
+		383DBC9350D061AB3CE0A7CB /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A1A793B2AC69EC9CECF4238 /* DashboardView.swift */; };
+		4607545379432408886BD656 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8AFB5149EF7995766580060 /* SettingsView.swift */; };
+		46EBB909BCF04216504E1B32 /* AttendanceMutationServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD8B89274E0C594EFC079520 /* AttendanceMutationServiceTests.swift */; };
+		48095069C905A15357D08F17 /* SharedViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 720CEDA4B2DCFC71BCCA753E /* SharedViews.swift */; };
+		49ABF1FC0880B3190484C2DE /* DakaApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 347ACB5CDE0D77A21F5174EE /* DakaApp.swift */; };
+		49B3F829E4A667B6F09598B2 /* QuickAttendanceIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD8C68E3AC514129D7BD13E8 /* QuickAttendanceIntents.swift */; };
+		4FD922F2F6F0859AC94F5BF2 /* DakaWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 8C0332378D90B2FE9BA95E7A /* DakaWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		5E82CBBB1E34C20252A54973 /* AttendancePeriodTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 337958FCC7A7D688962E87A5 /* AttendancePeriodTests.swift */; };
+		608CC71C2993F0BA90873D23 /* QuickAttendanceIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD8C68E3AC514129D7BD13E8 /* QuickAttendanceIntents.swift */; };
+		6DEAC97C84421D4E30E2AEB6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 22787366D7688DA6FB6A40F5 /* Assets.xcassets */; };
+		7DECAD8BCF56A632011C8EB0 /* AppDataContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A2C54B62E0FBB5822D6B9B6 /* AppDataContainer.swift */; };
+		8E1B0C378355FFD59B7E3E91 /* AttendancePeriod.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C99CF4AAD1A6B4B5A3F941B /* AttendancePeriod.swift */; };
+		8E65155D84EF53F407262C2B /* AppConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5776D6547FBDFE213CC2C57 /* AppConstants.swift */; };
+		90E587D0C2C5F4DE0E9E3C8B /* AppDataContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A2C54B62E0FBB5822D6B9B6 /* AppDataContainer.swift */; };
+		92B80C9BBC2F3E594290ABED /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90D00CCE03CB4F7892B531EF /* HistoryView.swift */; };
+		986E180CA8F790DB19912CB8 /* DakaWidgetSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D5F476593A00D936C37E167 /* DakaWidgetSnapshot.swift */; };
+		A1BC9DF89D73EF5253346FDB /* AttendanceMutationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E1399407E0F8CEE0ED215D1 /* AttendanceMutationService.swift */; };
+		A748360E7935D2B7571BDEFD /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 950D60AA145141709C93720A /* NotificationService.swift */; };
+		A7DFA894642E260ECB578A1F /* AppConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5776D6547FBDFE213CC2C57 /* AppConstants.swift */; };
+		AAF6FBD4577B14F5E16E0334 /* BackupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B15C37FB28D1D88EA5A70FDC /* BackupView.swift */; };
+		BCB10C3125BBD620FD2279F0 /* TodayEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70E6755D8958FF3EF1C64F49 /* TodayEditorView.swift */; };
+		D1916C45298A921B49619298 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A983F284E1DFB5DEF62840 /* ContentView.swift */; };
+		D432CF236D6AB914CB654172 /* AttendancePeriod.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C99CF4AAD1A6B4B5A3F941B /* AttendancePeriod.swift */; };
+		D6180EEFA187D9FF39F2B499 /* DakaWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96C59B039D1F9EA146974847 /* DakaWidget.swift */; };
+		D64E7712396E579D5BAD095E /* AttendanceMutationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E1399407E0F8CEE0ED215D1 /* AttendanceMutationService.swift */; };
+		D74D178FBC866EF100BEF9CB /* MenuBarAttendanceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90F34E489ADAA9542317FD81 /* MenuBarAttendanceView.swift */; };
+		E86A4EFC4C67C54511E3C40E /* AttendanceCalculatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 402B8AC9AD077B7B4B826385 /* AttendanceCalculatorTests.swift */; };
+		F03E53E1232F712E8D09E4AA /* AttendanceRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17CB3B7B2AD2289B8E65AA2E /* AttendanceRecord.swift */; };
+		F4B86416198CFD9B9D5E3415 /* AttendanceRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17CB3B7B2AD2289B8E65AA2E /* AttendanceRecord.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		40E62F87D026E00129DF1F76 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 221A44AE70492D9A3A0A7CA1 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 197355D44C2DACC5DE047BEE;
+			remoteInfo = Daka;
+		};
+		543904E958988674D5FA03E3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 221A44AE70492D9A3A0A7CA1 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 64A499F70F186C6F40D77D51;
+			remoteInfo = DakaWidget;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		ACD3738ABA3696FC74974F9C /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				4FD922F2F6F0859AC94F5BF2 /* DakaWidget.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		0A1A793B2AC69EC9CECF4238 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
+		17CB3B7B2AD2289B8E65AA2E /* AttendanceRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttendanceRecord.swift; sourceTree = "<group>"; };
+		1D9AC98A357D8EF75C9D0243 /* DakaTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DakaTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		22787366D7688DA6FB6A40F5 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		2398F7623B1F6F3CF8F9A3C5 /* AttendanceCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttendanceCalculator.swift; sourceTree = "<group>"; };
+		27344E1B0C4BE34653DB248B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		276149BB00523AD4962CEBE4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		2765BAAB22269F2BBAD77BD4 /* Daka.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Daka.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		2A2C54B62E0FBB5822D6B9B6 /* AppDataContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDataContainer.swift; sourceTree = "<group>"; };
+		337958FCC7A7D688962E87A5 /* AttendancePeriodTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttendancePeriodTests.swift; sourceTree = "<group>"; };
+		347ACB5CDE0D77A21F5174EE /* DakaApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DakaApp.swift; sourceTree = "<group>"; };
+		37A983F284E1DFB5DEF62840 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		402B8AC9AD077B7B4B826385 /* AttendanceCalculatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttendanceCalculatorTests.swift; sourceTree = "<group>"; };
+		5B6831BFAD7535BE9B6F29C3 /* DakaWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DakaWidget.entitlements; sourceTree = "<group>"; };
+		5E1399407E0F8CEE0ED215D1 /* AttendanceMutationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttendanceMutationService.swift; sourceTree = "<group>"; };
+		6C99CF4AAD1A6B4B5A3F941B /* AttendancePeriod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttendancePeriod.swift; sourceTree = "<group>"; };
+		70E6755D8958FF3EF1C64F49 /* TodayEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayEditorView.swift; sourceTree = "<group>"; };
+		720CEDA4B2DCFC71BCCA753E /* SharedViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedViews.swift; sourceTree = "<group>"; };
+		76116D84FD4EA18548862AAE /* BackupService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupService.swift; sourceTree = "<group>"; };
+		8C0332378D90B2FE9BA95E7A /* DakaWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = DakaWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		8D5F476593A00D936C37E167 /* DakaWidgetSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DakaWidgetSnapshot.swift; sourceTree = "<group>"; };
+		90D00CCE03CB4F7892B531EF /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
+		90F34E489ADAA9542317FD81 /* MenuBarAttendanceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarAttendanceView.swift; sourceTree = "<group>"; };
+		950D60AA145141709C93720A /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
+		96C59B039D1F9EA146974847 /* DakaWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DakaWidget.swift; sourceTree = "<group>"; };
+		A2A5CD8266D3E6E97DED0AD1 /* AttendanceStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttendanceStore.swift; sourceTree = "<group>"; };
+		B15C37FB28D1D88EA5A70FDC /* BackupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupView.swift; sourceTree = "<group>"; };
+		CD8B89274E0C594EFC079520 /* AttendanceMutationServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttendanceMutationServiceTests.swift; sourceTree = "<group>"; };
+		D5776D6547FBDFE213CC2C57 /* AppConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConstants.swift; sourceTree = "<group>"; };
+		E8AFB5149EF7995766580060 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		EA67EA484F9821B5D842C530 /* Daka.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Daka.entitlements; sourceTree = "<group>"; };
+		FD8C68E3AC514129D7BD13E8 /* QuickAttendanceIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickAttendanceIntents.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		0854156DE0787175CD4D33A9 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				D5776D6547FBDFE213CC2C57 /* AppConstants.swift */,
+				2A2C54B62E0FBB5822D6B9B6 /* AppDataContainer.swift */,
+				2398F7623B1F6F3CF8F9A3C5 /* AttendanceCalculator.swift */,
+				5E1399407E0F8CEE0ED215D1 /* AttendanceMutationService.swift */,
+				6C99CF4AAD1A6B4B5A3F941B /* AttendancePeriod.swift */,
+				17CB3B7B2AD2289B8E65AA2E /* AttendanceRecord.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		0995B24F9FAF8E55B381F7E3 = {
+			isa = PBXGroup;
+			children = (
+				34E56ABC95C77067B26DC114 /* App */,
+				8D39E3ABFB5D7A681ACACFF2 /* Intents */,
+				B838D18DCB7ED4F0953C7AC6 /* Resources */,
+				0854156DE0787175CD4D33A9 /* Shared */,
+				E127D0E17BF37158FC4C4F79 /* Tests */,
+				38ABA9372F55CF00EAF0002F /* Widget */,
+				3DF3349E689624A00482F4BD /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		34E56ABC95C77067B26DC114 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				A2A5CD8266D3E6E97DED0AD1 /* AttendanceStore.swift */,
+				76116D84FD4EA18548862AAE /* BackupService.swift */,
+				B15C37FB28D1D88EA5A70FDC /* BackupView.swift */,
+				37A983F284E1DFB5DEF62840 /* ContentView.swift */,
+				EA67EA484F9821B5D842C530 /* Daka.entitlements */,
+				347ACB5CDE0D77A21F5174EE /* DakaApp.swift */,
+				0A1A793B2AC69EC9CECF4238 /* DashboardView.swift */,
+				90D00CCE03CB4F7892B531EF /* HistoryView.swift */,
+				27344E1B0C4BE34653DB248B /* Info.plist */,
+				90F34E489ADAA9542317FD81 /* MenuBarAttendanceView.swift */,
+				950D60AA145141709C93720A /* NotificationService.swift */,
+				E8AFB5149EF7995766580060 /* SettingsView.swift */,
+				720CEDA4B2DCFC71BCCA753E /* SharedViews.swift */,
+				70E6755D8958FF3EF1C64F49 /* TodayEditorView.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		38ABA9372F55CF00EAF0002F /* Widget */ = {
+			isa = PBXGroup;
+			children = (
+				5B6831BFAD7535BE9B6F29C3 /* DakaWidget.entitlements */,
+				96C59B039D1F9EA146974847 /* DakaWidget.swift */,
+				8D5F476593A00D936C37E167 /* DakaWidgetSnapshot.swift */,
+				276149BB00523AD4962CEBE4 /* Info.plist */,
+			);
+			path = Widget;
+			sourceTree = "<group>";
+		};
+		3DF3349E689624A00482F4BD /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				2765BAAB22269F2BBAD77BD4 /* Daka.app */,
+				1D9AC98A357D8EF75C9D0243 /* DakaTests.xctest */,
+				8C0332378D90B2FE9BA95E7A /* DakaWidget.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		8D39E3ABFB5D7A681ACACFF2 /* Intents */ = {
+			isa = PBXGroup;
+			children = (
+				FD8C68E3AC514129D7BD13E8 /* QuickAttendanceIntents.swift */,
+			);
+			path = Intents;
+			sourceTree = "<group>";
+		};
+		B838D18DCB7ED4F0953C7AC6 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				22787366D7688DA6FB6A40F5 /* Assets.xcassets */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		E127D0E17BF37158FC4C4F79 /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				402B8AC9AD077B7B4B826385 /* AttendanceCalculatorTests.swift */,
+				CD8B89274E0C594EFC079520 /* AttendanceMutationServiceTests.swift */,
+				337958FCC7A7D688962E87A5 /* AttendancePeriodTests.swift */,
+			);
+			path = Tests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		197355D44C2DACC5DE047BEE /* Daka */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4A2AA4D80CC5AC19B9A8BA9F /* Build configuration list for PBXNativeTarget "Daka" */;
+			buildPhases = (
+				82185715DD3C5B3711A5BBB2 /* Sources */,
+				BEDFC8C1882F77EF6970695B /* Resources */,
+				ACD3738ABA3696FC74974F9C /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				9A6241ED5A856F8AEF4E9CAE /* PBXTargetDependency */,
+			);
+			name = Daka;
+			packageProductDependencies = (
+			);
+			productName = Daka;
+			productReference = 2765BAAB22269F2BBAD77BD4 /* Daka.app */;
+			productType = "com.apple.product-type.application";
+		};
+		64A499F70F186C6F40D77D51 /* DakaWidget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 55147F5B3876A8B83EDF8FC3 /* Build configuration list for PBXNativeTarget "DakaWidget" */;
+			buildPhases = (
+				120DBE4F3C427D6AE63CC2BC /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = DakaWidget;
+			packageProductDependencies = (
+			);
+			productName = DakaWidget;
+			productReference = 8C0332378D90B2FE9BA95E7A /* DakaWidget.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		95F37E29C35A478DC61ED9D7 /* DakaTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 31ABD1E629294D302B8EA70C /* Build configuration list for PBXNativeTarget "DakaTests" */;
+			buildPhases = (
+				1DE35C2C0C616890169D4F19 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				944C48B0BF3F5C20FF6B1385 /* PBXTargetDependency */,
+			);
+			name = DakaTests;
+			packageProductDependencies = (
+			);
+			productName = DakaTests;
+			productReference = 1D9AC98A357D8EF75C9D0243 /* DakaTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		221A44AE70492D9A3A0A7CA1 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 2600;
+				TargetAttributes = {
+					197355D44C2DACC5DE047BEE = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+					64A499F70F186C6F40D77D51 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+					95F37E29C35A478DC61ED9D7 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = F034BD6C9900203381BDA998 /* Build configuration list for PBXProject "Daka" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 0995B24F9FAF8E55B381F7E3;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 3DF3349E689624A00482F4BD /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				197355D44C2DACC5DE047BEE /* Daka */,
+				64A499F70F186C6F40D77D51 /* DakaWidget */,
+				95F37E29C35A478DC61ED9D7 /* DakaTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		BEDFC8C1882F77EF6970695B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6DEAC97C84421D4E30E2AEB6 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		120DBE4F3C427D6AE63CC2BC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A7DFA894642E260ECB578A1F /* AppConstants.swift in Sources */,
+				90E587D0C2C5F4DE0E9E3C8B /* AppDataContainer.swift in Sources */,
+				16CEBA15388CDD33BEF28CEF /* AttendanceCalculator.swift in Sources */,
+				A1BC9DF89D73EF5253346FDB /* AttendanceMutationService.swift in Sources */,
+				8E1B0C378355FFD59B7E3E91 /* AttendancePeriod.swift in Sources */,
+				F03E53E1232F712E8D09E4AA /* AttendanceRecord.swift in Sources */,
+				D6180EEFA187D9FF39F2B499 /* DakaWidget.swift in Sources */,
+				986E180CA8F790DB19912CB8 /* DakaWidgetSnapshot.swift in Sources */,
+				49B3F829E4A667B6F09598B2 /* QuickAttendanceIntents.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1DE35C2C0C616890169D4F19 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E86A4EFC4C67C54511E3C40E /* AttendanceCalculatorTests.swift in Sources */,
+				46EBB909BCF04216504E1B32 /* AttendanceMutationServiceTests.swift in Sources */,
+				5E82CBBB1E34C20252A54973 /* AttendancePeriodTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		82185715DD3C5B3711A5BBB2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8E65155D84EF53F407262C2B /* AppConstants.swift in Sources */,
+				7DECAD8BCF56A632011C8EB0 /* AppDataContainer.swift in Sources */,
+				2F881FDFF2ECDCCE48DF2B38 /* AttendanceCalculator.swift in Sources */,
+				D64E7712396E579D5BAD095E /* AttendanceMutationService.swift in Sources */,
+				D432CF236D6AB914CB654172 /* AttendancePeriod.swift in Sources */,
+				F4B86416198CFD9B9D5E3415 /* AttendanceRecord.swift in Sources */,
+				3508447C5189AE42A5C00E81 /* AttendanceStore.swift in Sources */,
+				0C75EEB03C00776DB6FFEBC4 /* BackupService.swift in Sources */,
+				AAF6FBD4577B14F5E16E0334 /* BackupView.swift in Sources */,
+				D1916C45298A921B49619298 /* ContentView.swift in Sources */,
+				49ABF1FC0880B3190484C2DE /* DakaApp.swift in Sources */,
+				383DBC9350D061AB3CE0A7CB /* DashboardView.swift in Sources */,
+				92B80C9BBC2F3E594290ABED /* HistoryView.swift in Sources */,
+				D74D178FBC866EF100BEF9CB /* MenuBarAttendanceView.swift in Sources */,
+				A748360E7935D2B7571BDEFD /* NotificationService.swift in Sources */,
+				608CC71C2993F0BA90873D23 /* QuickAttendanceIntents.swift in Sources */,
+				4607545379432408886BD656 /* SettingsView.swift in Sources */,
+				48095069C905A15357D08F17 /* SharedViews.swift in Sources */,
+				BCB10C3125BBD620FD2279F0 /* TodayEditorView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		944C48B0BF3F5C20FF6B1385 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 197355D44C2DACC5DE047BEE /* Daka */;
+			targetProxy = 40E62F87D026E00129DF1F76 /* PBXContainerItemProxy */;
+		};
+		9A6241ED5A856F8AEF4E9CAE /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 64A499F70F186C6F40D77D51 /* DakaWidget */;
+			targetProxy = 543904E958988674D5FA03E3 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		010256875E15531E81CBC82E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = Widget/DakaWidget.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = Widget/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.duanice.daka.widget;
+				PRODUCT_NAME = DakaWidget;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		1B15E811DBF67F4EC18634D9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.duanice.daka.tests;
+				SDKROOT = macosx;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Daka.app/Contents/MacOS/Daka";
+			};
+			name = Debug;
+		};
+		2284A359B4BAF43DF484774F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = App/Daka.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = App/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "中关村实验室打卡 for 段冰洁";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.duanice.daka;
+				PRODUCT_NAME = Daka;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		95D8DE7699348F7080179888 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.duanice.daka.tests;
+				SDKROOT = macosx;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Daka.app/Contents/MacOS/Daka";
+			};
+			name = Release;
+		};
+		C5E0E99DF0DD94A62ACC5E99 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = App/Daka.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = App/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "中关村实验室打卡 for 段冰洁";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.duanice.daka;
+				PRODUCT_NAME = Daka;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		CE012D1EFD35D9D0472AFF72 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = Widget/DakaWidget.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = Widget/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.duanice.daka.widget;
+				PRODUCT_NAME = DakaWidget;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+		DD711B8B18CB42C7E56B66DD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				OTHER_SWIFT_FLAGS = "$(inherited) -disable-sandbox";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		F500124A73AAE6D776F56279 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				OTHER_SWIFT_FLAGS = "$(inherited) -disable-sandbox";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		31ABD1E629294D302B8EA70C /* Build configuration list for PBXNativeTarget "DakaTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1B15E811DBF67F4EC18634D9 /* Debug */,
+				95D8DE7699348F7080179888 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		4A2AA4D80CC5AC19B9A8BA9F /* Build configuration list for PBXNativeTarget "Daka" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2284A359B4BAF43DF484774F /* Debug */,
+				C5E0E99DF0DD94A62ACC5E99 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		55147F5B3876A8B83EDF8FC3 /* Build configuration list for PBXNativeTarget "DakaWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				010256875E15531E81CBC82E /* Debug */,
+				CE012D1EFD35D9D0472AFF72 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		F034BD6C9900203381BDA998 /* Build configuration list for PBXProject "Daka" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DD711B8B18CB42C7E56B66DD /* Debug */,
+				F500124A73AAE6D776F56279 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 221A44AE70492D9A3A0A7CA1 /* Project object */;
+}
