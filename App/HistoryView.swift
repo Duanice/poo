@@ -92,14 +92,28 @@ struct HistoryView: View {
             .listStyle(.inset)
         }
         .sheet(item: $editingDay) { selection in
-            ScrollView {
-                TodayEditorView(
-                    workDate: selection.date,
-                    record: store.record(on: selection.date),
-                    title: "编辑打卡记录"
-                )
-                .id(store.changeToken)
-                .padding(24)
+            VStack(spacing: 0) {
+                HStack {
+                    Spacer()
+                    Button {
+                        editingDay = nil
+                    } label: {
+                        Label("关闭", systemImage: "xmark")
+                    }
+                    .keyboardShortcut(.cancelAction)
+                }
+                .padding(.horizontal, 24)
+                .padding(.top, 18)
+
+                ScrollView {
+                    TodayEditorView(
+                        workDate: selection.date,
+                        record: store.record(on: selection.date),
+                        title: "编辑打卡记录"
+                    )
+                    .id(store.changeToken)
+                    .padding(24)
+                }
             }
             .environmentObject(store)
             .frame(width: 700, height: 560)
