@@ -1,7 +1,6 @@
 import Foundation
 
 enum AppConstants {
-    static let appGroupIdentifier = "group.com.duanice.daka"
     static let widgetKind = "DakaAttendanceWidget"
     static let defaultTargetMinutes = 160 * 60
     static let defaultStartMinute = 10 * 60

@@ -78,12 +78,15 @@ enum BackupService {
     }
 
     static func writeAutomaticBackup(records: [AttendanceRecord]) throws -> URL {
-        guard let container = FileManager.default.containerURL(
-            forSecurityApplicationGroupIdentifier: AppConstants.appGroupIdentifier
-        ) else {
-            throw BackupError.appGroupUnavailable
-        }
-        let directory = container.appending(path: "Backups", directoryHint: .isDirectory)
+        let applicationSupport = try FileManager.default.url(
+            for: .applicationSupportDirectory,
+            in: .userDomainMask,
+            appropriateFor: nil,
+            create: true
+        )
+        let directory = applicationSupport
+            .appending(path: "com.duanice.daka", directoryHint: .isDirectory)
+            .appending(path: "Backups", directoryHint: .isDirectory)
         try FileManager.default.createDirectory(
             at: directory,
             withIntermediateDirectories: true
@@ -103,14 +106,11 @@ enum BackupService {
 
 enum BackupError: LocalizedError {
     case unsupportedVersion(Int)
-    case appGroupUnavailable
 
     var errorDescription: String? {
         switch self {
         case .unsupportedVersion(let version):
             return "不支持版本为 \(version) 的备份文件。"
-        case .appGroupUnavailable:
-            return "无法访问应用的安全数据目录。"
         }
     }
 }

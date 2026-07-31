@@ -45,6 +45,12 @@ final class AttendanceStore: ObservableObject {
         self.modelContext = ModelContext(modelContainer)
         self.modelContext.autosaveEnabled = true
         self.calendar = calendar
+        do {
+            try restoreFromWidgetSnapshotIfNeeded()
+        } catch {
+            errorMessage = "旧版数据恢复失败：\(error.localizedDescription)"
+            return
+        }
         refresh()
     }
 
@@ -352,6 +358,32 @@ final class AttendanceStore: ObservableObject {
 
     private func didMutate() {
         refresh()
+    }
+
+    private func restoreFromWidgetSnapshotIfNeeded() throws {
+        guard try modelContext.fetchCount(FetchDescriptor<AttendanceRecord>()) == 0 else {
+            return
+        }
+
+        let snapshot: WidgetSnapshotDocument
+        do {
+            snapshot = try WidgetSnapshotStore.load()
+        } catch let error as CocoaError where error.code == .fileReadNoSuchFile {
+            return
+        }
+        guard !snapshot.records.isEmpty else { return }
+
+        for item in snapshot.records {
+            modelContext.insert(
+                AttendanceRecord(
+                    workDate: item.workDate,
+                    checkIn: item.checkIn,
+                    checkOut: item.checkOut,
+                    isSlacking: item.isSlacking
+                )
+            )
+        }
+        try modelContext.save()
     }
 
     private func toggleTodaySlackingFromWidget() {

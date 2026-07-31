@@ -20,7 +20,7 @@ enum AppDataContainer {
                 schema: schema,
                 isStoredInMemoryOnly: false,
                 allowsSave: true,
-                groupContainer: .identifier(AppConstants.appGroupIdentifier),
+                groupContainer: .none,
                 cloudKitDatabase: .none
             )
         }

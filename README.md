@@ -21,7 +21,7 @@
 - JSON 完整备份与恢复；恢复前自动备份现有数据
 - CSV 导出，可直接用 Excel 或 Numbers 打开
 - 可选的本地上下班提醒
-- 原始数据库保存在本机 App Group 容器中；Widget 只读取主应用生成的最小数据快照
+- 原始数据库和自动备份保存在主应用自己的 macOS 沙盒容器中；Widget 只读取主应用生成的最小数据快照
 
 ## 系统要求
 
@@ -36,21 +36,9 @@
 2. 在项目导航器中选择蓝色的 `Daka` 项目。
 3. 依次选择 `Daka`、`DakaWidget` 和 `DakaTests` Target。
 4. 在 **Signing & Capabilities** 中为三个 Target 选择同一个 Team。
-5. `Daka` Target 使用以下 App Group 保存原始数据库：
-
-   ```text
-   group.com.duanice.daka
-   ```
-
-   `DakaWidget` 不直接打开数据库，而是读取主应用生成的数据快照，因此使用 Personal Team 时也能正常显示。
-
+5. 不需要添加 App Groups Capability；主程序和 Widget 均可使用 Personal Team 签名。
 6. 在顶部 Scheme 选择 `Daka`，运行目标选择 **My Mac**。
 7. 按 `⌘R` 构建并运行。第一次打开主应用会自动生成 Widget 快照。
-
-如果需要更换 App Group 标识符，请同步修改：
-
-- `Shared/AppConstants.swift`
-- `App/Daka.entitlements`
 
 首次运行后，若要添加桌面组件：
 
@@ -73,19 +61,19 @@
 
 ## 数据与隐私
 
-应用不包含服务器、账号系统、广告或统计 SDK。数据默认保存在：
+应用不包含服务器、账号系统、广告或统计 SDK。原始数据库默认保存在主应用的 macOS 沙盒容器：
 
 ```text
-group.com.duanice.daka
+~/Library/Containers/com.duanice.daka/Data/Library/Application Support/
 ```
 
-对应的 macOS App Group 安全容器中。桌面组件所需的只读快照位于：
+桌面组件所需的只读快照位于：
 
 ```text
 ~/Library/Application Support/com.duanice.daka/widget-snapshot-v1.json
 ```
 
-快照仅包含计算 Widget 所需的日期、上下班时间、摆烂状态和周期目标，文件权限为当前用户可读写。个人数据库、快照、导出文件、备份文件和签名证书都已排除在 Git 版本控制之外。
+快照仅包含计算 Widget 所需的日期、上下班时间、摆烂状态和周期目标，文件权限为当前用户可读写。Widget 不直接打开 SwiftData 数据库，因此不依赖付费开发者账号提供的 App Groups 能力。个人数据库、快照、导出文件、备份文件和签名证书都已排除在 Git 版本控制之外。
 
 建议每月至少导出一次 JSON 完整备份。CSV 适合查看和统计，不用于完整恢复。
 
