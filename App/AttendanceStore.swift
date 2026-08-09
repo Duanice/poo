@@ -35,6 +35,7 @@ final class AttendanceStore: ObservableObject {
     @Published var errorMessage: String?
     @Published var feedback: AppFeedback?
     @Published var editRequest: RecordEditRequest?
+    @Published var requestedDestination: SidebarDestination?
 
     let modelContext: ModelContext
     private let calendar: Calendar
@@ -206,7 +207,7 @@ final class AttendanceStore: ObservableObject {
         guard let item = record(on: date), !item.isSlacking else {
             return false
         }
-        return item.checkIn != nil || item.checkOut != nil
+        return item.hasAnyEffectiveTime
     }
 
     @discardableResult
@@ -272,7 +273,12 @@ final class AttendanceStore: ObservableObject {
                         note: snapshot.note,
                         isSlacking: snapshot.isSlacking ?? false,
                         createdAt: snapshot.createdAt,
-                        updatedAt: snapshot.updatedAt
+                        updatedAt: snapshot.updatedAt,
+                        actualCheckIn: snapshot.actualCheckIn,
+                        actualCheckOut: snapshot.actualCheckOut,
+                        actualDurationMinutes: snapshot.actualDurationMinutes,
+                        actualImportedAt: snapshot.actualImportedAt,
+                        actualImportBatchID: snapshot.actualImportBatchID
                     )
                 )
                 try modelContext.save()
@@ -325,6 +331,8 @@ final class AttendanceStore: ObservableObject {
             }
         case "sync":
             refresh()
+        case "import":
+            requestedDestination = .actualImport
         default:
             break
         }
@@ -343,7 +351,12 @@ final class AttendanceStore: ObservableObject {
                     note: item.note,
                     isSlacking: item.isSlacking ?? false,
                     createdAt: item.createdAt,
-                    updatedAt: item.updatedAt
+                    updatedAt: item.updatedAt,
+                    actualCheckIn: item.actualCheckIn,
+                    actualCheckOut: item.actualCheckOut,
+                    actualDurationMinutes: item.actualDurationMinutes,
+                    actualImportedAt: item.actualImportedAt,
+                    actualImportBatchID: item.actualImportBatchID
                 )
             )
         }
@@ -354,6 +367,53 @@ final class AttendanceStore: ObservableObject {
             detail: "已恢复 \(items.count) 条记录",
             style: .success
         )
+    }
+
+    func importLabAttendance(
+        _ rows: [LabAttendanceImportRow]
+    ) throws -> LabAttendanceImportApplyResult {
+        _ = try BackupService.writeAutomaticBackup(records: records)
+        let result = try LabAttendanceImportService(
+            context: modelContext,
+            calendar: calendar
+        ).apply(rows)
+        refresh()
+        presentFeedback(
+            title: "实验室实际数据已更新",
+            detail: "更新 \(result.changed) 天，\(result.unchanged) 天无变化",
+            style: .success
+        )
+        return result
+    }
+
+    @discardableResult
+    func clearActualData(on date: Date) -> Bool {
+        guard let existing = record(on: date), existing.hasActualData else {
+            return true
+        }
+        do {
+            pendingUndo = UndoRecordSnapshot(
+                date: date,
+                record: BackupRecord(record: existing)
+            )
+            try AttendanceMutationService(
+                context: modelContext,
+                calendar: calendar
+            ).clearActualData(on: date)
+            refresh()
+            presentFeedback(
+                title: "\(DakaFormatters.shortDay(date)) 实际数据已移除",
+                detail: "统计已恢复使用手动记录",
+                style: .warning,
+                actionTitle: "撤销",
+                duration: 6
+            )
+            return true
+        } catch {
+            pendingUndo = nil
+            errorMessage = "移除实际数据失败：\(error.localizedDescription)"
+            return false
+        }
     }
 
     private func didMutate() {
@@ -374,12 +434,19 @@ final class AttendanceStore: ObservableObject {
         guard !snapshot.records.isEmpty else { return }
 
         for item in snapshot.records {
+            let containsActualData = item.isActualData == true
             modelContext.insert(
                 AttendanceRecord(
                     workDate: item.workDate,
-                    checkIn: item.checkIn,
-                    checkOut: item.checkOut,
-                    isSlacking: item.isSlacking
+                    checkIn: containsActualData ? nil : item.checkIn,
+                    checkOut: containsActualData ? nil : item.checkOut,
+                    isSlacking: item.isSlacking,
+                    actualCheckIn: containsActualData ? item.checkIn : nil,
+                    actualCheckOut: containsActualData ? item.checkOut : nil,
+                    actualDurationMinutes: containsActualData
+                        ? item.durationMinutesOverride
+                        : nil,
+                    actualImportedAt: containsActualData ? snapshot.generatedAt : nil
                 )
             )
         }

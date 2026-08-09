@@ -3,6 +3,7 @@ import SwiftUI
 enum SidebarDestination: String, CaseIterable, Identifiable {
     case overview = "概览"
     case history = "历史记录"
+    case actualImport = "实际数据批量更新"
     case backup = "备份与导出"
     case settings = "设置"
 
@@ -12,6 +13,7 @@ enum SidebarDestination: String, CaseIterable, Identifiable {
         switch self {
         case .overview: "gauge.with.dots.needle.67percent"
         case .history: "calendar"
+        case .actualImport: "building.2.crop.circle"
         case .backup: "externaldrive.badge.timemachine"
         case .settings: "gearshape"
         }
@@ -38,6 +40,8 @@ struct ContentView: View {
                         DashboardView()
                     case .history:
                         HistoryView()
+                    case .actualImport:
+                        LabAttendanceImportView()
                     case .backup:
                         BackupView()
                     case .settings:
@@ -57,6 +61,12 @@ struct ContentView: View {
             }
         }
         .animation(.snappy, value: store.feedback?.id)
+        .onAppear {
+            selectRequestedDestination(store.requestedDestination)
+        }
+        .onChange(of: store.requestedDestination) { _, destination in
+            selectRequestedDestination(destination)
+        }
         .sheet(item: $store.editRequest) { request in
             RecordEditorSheet(date: request.date)
                 .environmentObject(store)
@@ -74,5 +84,11 @@ struct ContentView: View {
         } message: {
             Text(store.errorMessage ?? "发生未知错误")
         }
+    }
+
+    private func selectRequestedDestination(_ destination: SidebarDestination?) {
+        guard let destination else { return }
+        selection = destination
+        store.requestedDestination = nil
     }
 }

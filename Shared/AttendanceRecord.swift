@@ -11,6 +11,11 @@ final class AttendanceRecord {
     var createdAt: Date
     var updatedAt: Date
     var isSlackingFlag: Bool?
+    var actualCheckIn: Date?
+    var actualCheckOut: Date?
+    var actualDurationMinutes: Int?
+    var actualImportedAt: Date?
+    var actualImportBatchID: UUID?
 
     init(
         id: UUID = UUID(),
@@ -20,7 +25,12 @@ final class AttendanceRecord {
         note: String = "",
         isSlacking: Bool = false,
         createdAt: Date = .now,
-        updatedAt: Date = .now
+        updatedAt: Date = .now,
+        actualCheckIn: Date? = nil,
+        actualCheckOut: Date? = nil,
+        actualDurationMinutes: Int? = nil,
+        actualImportedAt: Date? = nil,
+        actualImportBatchID: UUID? = nil
     ) {
         self.id = id
         self.workDate = Calendar.autoupdatingCurrent.startOfDay(for: workDate)
@@ -30,19 +40,51 @@ final class AttendanceRecord {
         self.isSlackingFlag = isSlacking
         self.createdAt = createdAt
         self.updatedAt = updatedAt
+        self.actualCheckIn = actualCheckIn
+        self.actualCheckOut = actualCheckOut
+        self.actualDurationMinutes = actualDurationMinutes
+        self.actualImportedAt = actualImportedAt
+        self.actualImportBatchID = actualImportBatchID
     }
 
     var isSlacking: Bool {
         isSlackingFlag == true
     }
 
+    var hasActualData: Bool {
+        actualCheckIn != nil
+            && actualCheckOut != nil
+            && actualDurationMinutes != nil
+    }
+
+    var effectiveCheckIn: Date? {
+        hasActualData ? actualCheckIn : checkIn
+    }
+
+    var effectiveCheckOut: Date? {
+        hasActualData ? actualCheckOut : checkOut
+    }
+
+    var hasAnyEffectiveTime: Bool {
+        effectiveCheckIn != nil || effectiveCheckOut != nil
+    }
+
     var durationMinutes: Int {
         guard !isSlacking else { return 0 }
-        return AttendanceCalculator.durationMinutes(checkIn: checkIn, checkOut: checkOut)
+        if hasActualData {
+            return max(0, actualDurationMinutes ?? 0)
+        }
+        return AttendanceCalculator.durationMinutes(
+            checkIn: checkIn,
+            checkOut: checkOut
+        )
     }
 
     var isComplete: Bool {
-        !isSlacking && checkIn != nil && checkOut != nil && durationMinutes > 0
+        !isSlacking
+            && effectiveCheckIn != nil
+            && effectiveCheckOut != nil
+            && durationMinutes > 0
     }
 }
 
@@ -63,7 +105,7 @@ enum AttendanceSummaryBuilder {
                 isPartial: record != nil
                     && record?.isSlacking != true
                     && record?.isComplete != true
-                    && (record?.checkIn != nil || record?.checkOut != nil),
+                    && record?.hasAnyEffectiveTime == true,
                 isSlacking: record?.isSlacking ?? false
             )
         }

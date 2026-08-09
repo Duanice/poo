@@ -123,7 +123,7 @@ final class AttendanceMutationServiceTests: XCTestCase {
         XCTAssertNil(backup.records[0].isSlacking)
     }
 
-    func testVersionTwoBackupPreservesSlackingState() throws {
+    func testVersionThreeBackupPreservesSlackingState() throws {
         let record = AttendanceRecord(
             workDate: .now,
             isSlacking: true
@@ -132,7 +132,7 @@ final class AttendanceMutationServiceTests: XCTestCase {
         let data = try BackupService.jsonData(records: [record])
         let backup = try BackupService.decode(data)
 
-        XCTAssertEqual(backup.formatVersion, 2)
+        XCTAssertEqual(backup.formatVersion, 3)
         XCTAssertEqual(backup.records.first?.isSlacking, true)
     }
 }

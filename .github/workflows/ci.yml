@@ -44,7 +44,7 @@ jobs:
             -o /tmp/daka-domain-tests
           /tmp/daka-domain-tests
 
-      - name: Build app and test bundle
+      - name: Build app and run tests
         run: |
           xcodebuild \
             -project Daka.xcodeproj \
@@ -53,4 +53,4 @@ jobs:
             -derivedDataPath /tmp/daka-derived \
             -destination 'platform=macOS' \
             CODE_SIGNING_ALLOWED=NO \
-            build-for-testing
+            test

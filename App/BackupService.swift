@@ -12,6 +12,11 @@ struct BackupRecord: Codable, Sendable {
     let isSlacking: Bool?
     let createdAt: Date
     let updatedAt: Date
+    let actualCheckIn: Date?
+    let actualCheckOut: Date?
+    let actualDurationMinutes: Int?
+    let actualImportedAt: Date?
+    let actualImportBatchID: UUID?
 
     init(record: AttendanceRecord) {
         id = record.id
@@ -22,6 +27,11 @@ struct BackupRecord: Codable, Sendable {
         isSlacking = record.isSlacking
         createdAt = record.createdAt
         updatedAt = record.updatedAt
+        actualCheckIn = record.actualCheckIn
+        actualCheckOut = record.actualCheckOut
+        actualDurationMinutes = record.actualDurationMinutes
+        actualImportedAt = record.actualImportedAt
+        actualImportBatchID = record.actualImportBatchID
     }
 }
 
@@ -32,7 +42,7 @@ struct BackupEnvelope: Codable, Sendable {
     let records: [BackupRecord]
 
     init(records: [AttendanceRecord]) {
-        formatVersion = 2
+        formatVersion = 3
         exportedAt = .now
         appName = "中关村实验室打卡 for 段冰洁"
         self.records = records.map(BackupRecord.init)
@@ -51,19 +61,25 @@ enum BackupService {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
         let envelope = try decoder.decode(BackupEnvelope.self, from: data)
-        guard envelope.formatVersion == 1 || envelope.formatVersion == 2 else {
+        guard (1...3).contains(envelope.formatVersion) else {
             throw BackupError.unsupportedVersion(envelope.formatVersion)
         }
         return envelope
     }
 
     static func csvData(records: [AttendanceRecord]) -> Data {
-        var lines = ["日期,日期状态,上班时间,下班时间,当日时长（分钟）,当日时长,记录状态,备注"]
+        var lines = [
+            "日期,数据来源,实际上班,实际下班,官方时长（分钟）,"
+                + "手动上班,手动下班,有效时长（分钟）,有效时长,记录状态,备注"
+        ]
         let ordered = records.sorted { $0.workDate < $1.workDate }
         for record in ordered {
             let columns = [
                 record.workDate.formatted(.iso8601.year().month().day()),
-                record.isSlacking ? "摆烂日" : "普通日期",
+                record.hasActualData ? "实验室实际数据" : "手动记录",
+                DakaFormatters.time(record.actualCheckIn),
+                DakaFormatters.time(record.actualCheckOut),
+                record.actualDurationMinutes.map(String.init) ?? "",
                 DakaFormatters.time(record.checkIn),
                 DakaFormatters.time(record.checkOut),
                 String(record.durationMinutes),
@@ -92,7 +108,8 @@ enum BackupService {
             withIntermediateDirectories: true
         )
         let url = directory.appending(
-            path: "auto-\(DakaFormatters.exportTimestamp()).daka-backup.json"
+            path: "auto-\(DakaFormatters.exportTimestamp())-"
+                + "\(UUID().uuidString.prefix(8)).daka-backup.json"
         )
         try jsonData(records: records).write(to: url, options: .atomic)
         return url

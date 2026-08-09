@@ -33,13 +33,16 @@ extension AttendanceRecord {
         if isSlacking {
             return "摆烂"
         }
+        if hasActualData {
+            return "实验室实际"
+        }
         if isComplete {
             return "已完成"
         }
-        if checkIn != nil {
+        if effectiveCheckIn != nil {
             return "进行中"
         }
-        if checkOut != nil {
+        if effectiveCheckOut != nil {
             return "待补上班"
         }
         return "未打卡"
@@ -47,8 +50,9 @@ extension AttendanceRecord {
 
     var statusColor: Color {
         if isSlacking { return .purple }
+        if hasActualData { return .cyan }
         if isComplete { return .green }
-        if checkIn != nil || checkOut != nil { return .orange }
+        if hasAnyEffectiveTime { return .orange }
         return .secondary
     }
 }

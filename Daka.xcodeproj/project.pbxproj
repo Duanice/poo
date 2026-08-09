@@ -7,7 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		04866CF90A398BF79CB01C23 /* LabAttendanceImportTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0793C532154A1CF7B484AD3 /* LabAttendanceImportTests.swift */; };
 		0C75EEB03C00776DB6FFEBC4 /* BackupService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76116D84FD4EA18548862AAE /* BackupService.swift */; };
+		0DFB12EFE614C5FBADB15B3A /* LabAttendanceImport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D253B3A67A799575C384D8F /* LabAttendanceImport.swift */; };
 		1685DAF2FAECC0A59AF31D5F /* WidgetSnapshotStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB817E18D000C617373ACBA7 /* WidgetSnapshotStore.swift */; };
 		16CEBA15388CDD33BEF28CEF /* AttendanceCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2398F7623B1F6F3CF8F9A3C5 /* AttendanceCalculator.swift */; };
 		2F881FDFF2ECDCCE48DF2B38 /* AttendanceCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2398F7623B1F6F3CF8F9A3C5 /* AttendanceCalculator.swift */; };
@@ -20,6 +22,7 @@
 		49B3F829E4A667B6F09598B2 /* QuickAttendanceIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD8C68E3AC514129D7BD13E8 /* QuickAttendanceIntents.swift */; };
 		4D388B74DCA8778A812271AF /* WidgetSnapshotStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB817E18D000C617373ACBA7 /* WidgetSnapshotStore.swift */; };
 		4FD922F2F6F0859AC94F5BF2 /* DakaWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 8C0332378D90B2FE9BA95E7A /* DakaWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		50623927396A9621393D2882 /* LabAttendanceImport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D253B3A67A799575C384D8F /* LabAttendanceImport.swift */; };
 		5E82CBBB1E34C20252A54973 /* AttendancePeriodTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 337958FCC7A7D688962E87A5 /* AttendancePeriodTests.swift */; };
 		608CC71C2993F0BA90873D23 /* QuickAttendanceIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD8C68E3AC514129D7BD13E8 /* QuickAttendanceIntents.swift */; };
 		6DEAC97C84421D4E30E2AEB6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 22787366D7688DA6FB6A40F5 /* Assets.xcassets */; };
@@ -33,6 +36,7 @@
 		A748360E7935D2B7571BDEFD /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 950D60AA145141709C93720A /* NotificationService.swift */; };
 		A7DFA894642E260ECB578A1F /* AppConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5776D6547FBDFE213CC2C57 /* AppConstants.swift */; };
 		AAF6FBD4577B14F5E16E0334 /* BackupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B15C37FB28D1D88EA5A70FDC /* BackupView.swift */; };
+		B9545E69B45D3F83B120F70A /* LabAttendanceImportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379CB4B03F2200679310B92D /* LabAttendanceImportView.swift */; };
 		BCB10C3125BBD620FD2279F0 /* TodayEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70E6755D8958FF3EF1C64F49 /* TodayEditorView.swift */; };
 		D1916C45298A921B49619298 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A983F284E1DFB5DEF62840 /* ContentView.swift */; };
 		D432CF236D6AB914CB654172 /* AttendancePeriod.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C99CF4AAD1A6B4B5A3F941B /* AttendancePeriod.swift */; };
@@ -87,7 +91,9 @@
 		2A2C54B62E0FBB5822D6B9B6 /* AppDataContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDataContainer.swift; sourceTree = "<group>"; };
 		337958FCC7A7D688962E87A5 /* AttendancePeriodTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttendancePeriodTests.swift; sourceTree = "<group>"; };
 		347ACB5CDE0D77A21F5174EE /* DakaApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DakaApp.swift; sourceTree = "<group>"; };
+		379CB4B03F2200679310B92D /* LabAttendanceImportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabAttendanceImportView.swift; sourceTree = "<group>"; };
 		37A983F284E1DFB5DEF62840 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		3D253B3A67A799575C384D8F /* LabAttendanceImport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabAttendanceImport.swift; sourceTree = "<group>"; };
 		402B8AC9AD077B7B4B826385 /* AttendanceCalculatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttendanceCalculatorTests.swift; sourceTree = "<group>"; };
 		5B6831BFAD7535BE9B6F29C3 /* DakaWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DakaWidget.entitlements; sourceTree = "<group>"; };
 		5E1399407E0F8CEE0ED215D1 /* AttendanceMutationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttendanceMutationService.swift; sourceTree = "<group>"; };
@@ -107,6 +113,7 @@
 		D5776D6547FBDFE213CC2C57 /* AppConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConstants.swift; sourceTree = "<group>"; };
 		E8AFB5149EF7995766580060 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		EA67EA484F9821B5D842C530 /* Daka.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Daka.entitlements; sourceTree = "<group>"; };
+		F0793C532154A1CF7B484AD3 /* LabAttendanceImportTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabAttendanceImportTests.swift; sourceTree = "<group>"; };
 		FB817E18D000C617373ACBA7 /* WidgetSnapshotStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetSnapshotStore.swift; sourceTree = "<group>"; };
 		FD8C68E3AC514129D7BD13E8 /* QuickAttendanceIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickAttendanceIntents.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -121,6 +128,7 @@
 				5E1399407E0F8CEE0ED215D1 /* AttendanceMutationService.swift */,
 				6C99CF4AAD1A6B4B5A3F941B /* AttendancePeriod.swift */,
 				17CB3B7B2AD2289B8E65AA2E /* AttendanceRecord.swift */,
+				3D253B3A67A799575C384D8F /* LabAttendanceImport.swift */,
 				FB817E18D000C617373ACBA7 /* WidgetSnapshotStore.swift */,
 			);
 			path = Shared;
@@ -151,6 +159,7 @@
 				0A1A793B2AC69EC9CECF4238 /* DashboardView.swift */,
 				90D00CCE03CB4F7892B531EF /* HistoryView.swift */,
 				27344E1B0C4BE34653DB248B /* Info.plist */,
+				379CB4B03F2200679310B92D /* LabAttendanceImportView.swift */,
 				90F34E489ADAA9542317FD81 /* MenuBarAttendanceView.swift */,
 				950D60AA145141709C93720A /* NotificationService.swift */,
 				E8AFB5149EF7995766580060 /* SettingsView.swift */,
@@ -203,6 +212,7 @@
 				402B8AC9AD077B7B4B826385 /* AttendanceCalculatorTests.swift */,
 				CD8B89274E0C594EFC079520 /* AttendanceMutationServiceTests.swift */,
 				337958FCC7A7D688962E87A5 /* AttendancePeriodTests.swift */,
+				F0793C532154A1CF7B484AD3 /* LabAttendanceImportTests.swift */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -333,6 +343,7 @@
 				F03E53E1232F712E8D09E4AA /* AttendanceRecord.swift in Sources */,
 				D6180EEFA187D9FF39F2B499 /* DakaWidget.swift in Sources */,
 				986E180CA8F790DB19912CB8 /* DakaWidgetSnapshot.swift in Sources */,
+				50623927396A9621393D2882 /* LabAttendanceImport.swift in Sources */,
 				49B3F829E4A667B6F09598B2 /* QuickAttendanceIntents.swift in Sources */,
 				4D388B74DCA8778A812271AF /* WidgetSnapshotStore.swift in Sources */,
 			);
@@ -345,6 +356,7 @@
 				E86A4EFC4C67C54511E3C40E /* AttendanceCalculatorTests.swift in Sources */,
 				46EBB909BCF04216504E1B32 /* AttendanceMutationServiceTests.swift in Sources */,
 				5E82CBBB1E34C20252A54973 /* AttendancePeriodTests.swift in Sources */,
+				04866CF90A398BF79CB01C23 /* LabAttendanceImportTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -365,6 +377,8 @@
 				49ABF1FC0880B3190484C2DE /* DakaApp.swift in Sources */,
 				383DBC9350D061AB3CE0A7CB /* DashboardView.swift in Sources */,
 				92B80C9BBC2F3E594290ABED /* HistoryView.swift in Sources */,
+				0DFB12EFE614C5FBADB15B3A /* LabAttendanceImport.swift in Sources */,
+				B9545E69B45D3F83B120F70A /* LabAttendanceImportView.swift in Sources */,
 				D74D178FBC866EF100BEF9CB /* MenuBarAttendanceView.swift in Sources */,
 				A748360E7935D2B7571BDEFD /* NotificationService.swift in Sources */,
 				608CC71C2993F0BA90873D23 /* QuickAttendanceIntents.swift in Sources */,

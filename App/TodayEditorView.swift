@@ -17,6 +17,7 @@ struct TodayEditorView: View {
     @State private var savedMessage: String?
     @State private var showDeleteConfirmation = false
     @State private var showSlackingConfirmation = false
+    @State private var showClearActualConfirmation = false
 
     init(
         workDate: Date,
@@ -94,6 +95,33 @@ struct TodayEditorView: View {
                     }
                 }
 
+                if let record, record.hasActualData {
+                    HStack(spacing: 14) {
+                        Image(systemName: "building.2.crop.circle.fill")
+                            .font(.system(size: 34))
+                            .foregroundStyle(.cyan)
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("实验室实际数据")
+                                .font(.headline)
+                            Text(
+                                "\(DakaFormatters.time(record.actualCheckIn)) — "
+                                    + "\(DakaFormatters.time(record.actualCheckOut)) · "
+                                    + "\(AttendanceCalculator.formatDuration(record.durationMinutes))"
+                            )
+                            .font(.body.monospacedDigit())
+                            Text("统计、日历和桌面组件优先采用该数据；下方仍保留你的手动记录。")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                        Spacer()
+                        Button("移除实际数据", role: .destructive) {
+                            showClearActualConfirmation = true
+                        }
+                    }
+                    .padding(14)
+                    .background(.cyan.opacity(0.09), in: RoundedRectangle(cornerRadius: 14))
+                }
+
                 if record?.isSlacking == true {
                     HStack(spacing: 16) {
                         Image(systemName: "moon.zzz.fill")
@@ -147,7 +175,7 @@ struct TodayEditorView: View {
 
                     HStack {
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("当日有效时长")
+                            Text(record?.hasActualData == true ? "手动记录时长" : "当日有效时长")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                             Text(AttendanceCalculator.formatDuration(proposedDuration))
@@ -202,6 +230,13 @@ struct TodayEditorView: View {
                         )
                         .font(.caption)
                         .foregroundStyle(.secondary)
+                    } else if record?.hasActualData == true {
+                        Label(
+                            "修改并保存手动记录不会覆盖实验室实际数据。",
+                            systemImage: "building.2"
+                        )
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                     }
                 }
             }
@@ -234,7 +269,21 @@ struct TodayEditorView: View {
             }
             Button("取消", role: .cancel) {}
         } message: {
-            Text("已有的上下班时间将被清空，但可以通过反馈提示中的“撤销”恢复。")
+            Text("已有的手动与实验室实际时间将被清空，但可以通过反馈提示中的“撤销”恢复。")
+        }
+        .confirmationDialog(
+            "确定移除 \(DakaFormatters.shortDay(workDate)) 的实验室实际数据吗？",
+            isPresented: $showClearActualConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("移除实际数据", role: .destructive) {
+                if store.clearActualData(on: workDate) {
+                    onFinished?()
+                }
+            }
+            Button("取消", role: .cancel) {}
+        } message: {
+            Text("移除后统计将恢复采用该日期的手动记录，并可通过反馈中的“撤销”恢复。")
         }
     }
 

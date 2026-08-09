@@ -27,7 +27,7 @@ struct BackupView: View {
                     VStack(alignment: .leading, spacing: 16) {
                         Label("完整备份", systemImage: "externaldrive.badge.plus")
                             .font(.headline)
-                        Text("JSON 备份包含所有打卡时间、备注和记录元数据，可用于完整恢复。")
+                        Text("JSON 备份包含手动记录、实验室实际数据、备注和记录元数据，可用于完整恢复。")
                             .foregroundStyle(.secondary)
                         HStack {
                             Button("导出 JSON 备份") {

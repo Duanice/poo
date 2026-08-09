@@ -43,7 +43,10 @@ struct MenuBarAttendanceView: View {
                         Label("摆烂", systemImage: "moon.zzz.fill")
                             .foregroundStyle(.purple)
                     } else {
-                        Text("\(DakaFormatters.time(today.checkIn)) — \(DakaFormatters.time(today.checkOut))")
+                        Text(
+                            "\(DakaFormatters.time(today.effectiveCheckIn)) — "
+                                + "\(DakaFormatters.time(today.effectiveCheckOut))"
+                        )
                             .foregroundStyle(.secondary)
                         Text(AttendanceCalculator.compactDuration(today.durationMinutes))
                             .monospacedDigit()

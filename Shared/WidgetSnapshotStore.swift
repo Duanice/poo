@@ -6,9 +6,14 @@ struct WidgetSnapshotRecord: Codable, Sendable, Equatable {
     let checkIn: Date?
     let checkOut: Date?
     let isSlacking: Bool
+    let durationMinutesOverride: Int?
+    let isActualData: Bool?
 
     var durationMinutes: Int {
         guard !isSlacking else { return 0 }
+        if let durationMinutesOverride {
+            return max(0, durationMinutesOverride)
+        }
         return AttendanceCalculator.durationMinutes(
             checkIn: checkIn,
             checkOut: checkOut
@@ -66,9 +71,13 @@ enum WidgetSnapshotStore {
             records: records.map {
                 WidgetSnapshotRecord(
                     workDate: $0.workDate,
-                    checkIn: $0.checkIn,
-                    checkOut: $0.checkOut,
-                    isSlacking: $0.isSlacking
+                    checkIn: $0.effectiveCheckIn,
+                    checkOut: $0.effectiveCheckOut,
+                    isSlacking: $0.isSlacking,
+                    durationMinutesOverride: $0.hasActualData
+                        ? $0.durationMinutes
+                        : nil,
+                    isActualData: $0.hasActualData
                 )
             }
         )

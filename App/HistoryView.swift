@@ -160,6 +160,7 @@ struct CycleCalendarView: View {
                 }
                 Spacer()
                 CalendarLegend(color: .blue, text: "已完成")
+                CalendarLegend(color: .cyan, text: "实验室实际")
                 CalendarLegend(color: .orange, text: "进行中")
                 CalendarLegend(color: .purple, text: "摆烂")
             }
@@ -256,6 +257,9 @@ private struct CalendarDayCell: View {
         if record?.isSlacking == true {
             return .purple.opacity(0.18)
         }
+        if record?.hasActualData == true {
+            return .cyan.opacity(0.22)
+        }
         if record?.isComplete == true {
             let intensity = min(
                 max(Double(record?.durationMinutes ?? 0) / Double(12 * 60), 0.25),
@@ -263,7 +267,7 @@ private struct CalendarDayCell: View {
             )
             return .blue.opacity(0.12 + intensity * 0.28)
         }
-        if record?.checkIn != nil || record?.checkOut != nil {
+        if record?.hasAnyEffectiveTime == true {
             return .orange.opacity(0.16)
         }
         return .secondary.opacity(0.06)
@@ -276,7 +280,7 @@ private struct CalendarDayCell: View {
         if record?.isComplete == true {
             return AttendanceCalculator.compactDuration(record?.durationMinutes ?? 0)
         }
-        if record?.checkIn != nil || record?.checkOut != nil {
+        if record?.hasAnyEffectiveTime == true {
             return "进行中"
         }
         return "未记录"
@@ -295,9 +299,11 @@ private struct CalendarDayCell: View {
                     HStack(spacing: 4) {
                         if record?.isSlacking == true {
                             Image(systemName: "moon.zzz.fill")
+                        } else if record?.hasActualData == true {
+                            Image(systemName: "building.2.fill")
                         } else if record?.isComplete == true {
                             Image(systemName: "checkmark.circle.fill")
-                        } else if record?.checkIn != nil || record?.checkOut != nil {
+                        } else if record?.hasAnyEffectiveTime == true {
                             Image(systemName: "clock.badge.exclamationmark")
                         }
                         Text(detail)
@@ -392,7 +398,10 @@ private struct DayRecordRow: View {
             .frame(width: 76, alignment: .leading)
 
             if let record {
-                Text("\(DakaFormatters.time(record.checkIn)) — \(DakaFormatters.time(record.checkOut))")
+                Text(
+                    "\(DakaFormatters.time(record.effectiveCheckIn)) — "
+                        + "\(DakaFormatters.time(record.effectiveCheckOut))"
+                )
                     .font(.body.monospacedDigit())
                     .frame(width: 150, alignment: .leading)
                 StatusPill(text: record.statusText, color: record.statusColor)

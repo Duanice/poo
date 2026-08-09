@@ -88,7 +88,7 @@ struct AttendanceMutationService {
 
         if enabled {
             if let existing,
-               (existing.checkIn != nil || existing.checkOut != nil),
+               existing.hasAnyEffectiveTime,
                !clearExistingRecord {
                 throw AttendanceMutationError.existingRecordRequiresConfirmation
             }
@@ -100,6 +100,11 @@ struct AttendanceMutationService {
             if clearExistingRecord {
                 item.checkIn = nil
                 item.checkOut = nil
+                item.actualCheckIn = nil
+                item.actualCheckOut = nil
+                item.actualDurationMinutes = nil
+                item.actualImportedAt = nil
+                item.actualImportBatchID = nil
             }
             item.isSlackingFlag = true
             item.updatedAt = .now
@@ -108,11 +113,29 @@ struct AttendanceMutationService {
             existing.updatedAt = .now
             if existing.checkIn == nil,
                existing.checkOut == nil,
+               !existing.hasActualData,
                existing.note.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                 context.delete(existing)
             }
         }
 
+        try context.save()
+    }
+
+    func clearActualData(on date: Date) throws {
+        guard let item = try record(on: date) else { return }
+        item.actualCheckIn = nil
+        item.actualCheckOut = nil
+        item.actualDurationMinutes = nil
+        item.actualImportedAt = nil
+        item.actualImportBatchID = nil
+        item.updatedAt = .now
+        if item.checkIn == nil,
+           item.checkOut == nil,
+           !item.isSlacking,
+           item.note.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            context.delete(item)
+        }
         try context.save()
     }
 

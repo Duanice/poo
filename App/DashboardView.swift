@@ -244,7 +244,10 @@ struct RecentRecordsCard: View {
                             Text(DakaFormatters.shortDay(record.workDate))
                                 .font(.body.monospacedDigit())
                                 .frame(width: 52, alignment: .leading)
-                            Text("\(DakaFormatters.time(record.checkIn)) — \(DakaFormatters.time(record.checkOut))")
+                            Text(
+                                "\(DakaFormatters.time(record.effectiveCheckIn)) — "
+                                    + "\(DakaFormatters.time(record.effectiveCheckOut))"
+                            )
                                 .foregroundStyle(.secondary)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                             StatusPill(text: record.statusText, color: record.statusColor)
