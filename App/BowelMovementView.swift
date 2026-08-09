@@ -4,19 +4,10 @@ import UniformTypeIdentifiers
 struct BowelMovementView: View {
     @EnvironmentObject private var store: AttendanceStore
 
-    @State private var selectedDate = Date.now
     @State private var editorRequest: BowelMovementEditorRequest?
     @State private var pendingDeletion: BowelMovementRecord?
     @State private var exportDocument = DakaExportDocument()
     @State private var showingExporter = false
-
-    private var selectedRecords: [BowelMovementRecord] {
-        store.bowelMovements(on: selectedDate)
-    }
-
-    private var selectedStatus: BowelDayStatus {
-        store.bowelDayStatus(on: selectedDate)
-    }
 
     var body: some View {
         ScrollView {
@@ -29,17 +20,15 @@ struct BowelMovementView: View {
                 }
 
                 quickRecordCard
-                managementCard
+                recordListCard
             }
             .padding(28)
             .frame(maxWidth: 900)
             .frame(maxWidth: .infinity)
         }
         .sheet(item: $editorRequest) { request in
-            BowelMovementEditorSheet(request: request) { occurredAt in
-                selectedDate = occurredAt
-            }
-            .environmentObject(store)
+            BowelMovementEditorSheet(request: request)
+                .environmentObject(store)
         }
         .confirmationDialog(
             "确定删除这条粑粑记录吗？",
@@ -103,62 +92,18 @@ struct BowelMovementView: View {
         }
     }
 
-    private var managementCard: some View {
+    private var recordListCard: some View {
         Card {
             VStack(alignment: .leading, spacing: 16) {
                 HStack {
                     VStack(alignment: .leading, spacing: 3) {
-                        Text("数据管理")
+                        Text("记录列表")
                             .font(.headline)
-                        Text("补录、修改或删除任意一天的单次记录。")
+                        Text("按时间倒序排列，最新记录在前 · 共 \(store.bowelMovements.count) 条")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
                     Spacer()
-                    Button {
-                        moveSelectedDate(by: -1)
-                    } label: {
-                        Image(systemName: "chevron.left")
-                    }
-                    Button("今天") {
-                        selectedDate = .now
-                    }
-                    Button {
-                        moveSelectedDate(by: 1)
-                    } label: {
-                        Image(systemName: "chevron.right")
-                    }
-                    DatePicker(
-                        "查看日期",
-                        selection: $selectedDate,
-                        displayedComponents: .date
-                    )
-                    .labelsHidden()
-                    .datePickerStyle(.field)
-                }
-
-                statusBanner
-                Divider()
-
-                if selectedRecords.isEmpty {
-                    ContentUnavailableView(
-                        emptyTitle,
-                        systemImage: emptyIcon,
-                        description: Text(emptyDescription)
-                    )
-                    .frame(maxWidth: .infinity, minHeight: 150)
-                } else {
-                    VStack(spacing: 0) {
-                        ForEach(selectedRecords) { record in
-                            bowelMovementRow(record)
-                            if record.id != selectedRecords.last?.id {
-                                Divider()
-                            }
-                        }
-                    }
-                }
-
-                HStack {
                     Button("导出全部粑粑 CSV") {
                         exportDocument = DakaExportDocument(
                             data: BackupService.bowelCSVData(
@@ -167,45 +112,49 @@ struct BowelMovementView: View {
                         )
                         showingExporter = true
                     }
-                    Spacer()
                     Button("补录一次") {
-                        editorRequest = .new(on: selectedDate)
+                        editorRequest = .new(on: .now)
                     }
                     .buttonStyle(.borderedProminent)
-                    .disabled(selectedStatus == .future)
+                }
+
+                Divider()
+
+                if store.bowelMovements.isEmpty {
+                    ContentUnavailableView(
+                        "还没有粑粑记录",
+                        systemImage: "tray",
+                        description: Text("点击“记录一次 💩”或“补录一次”添加。")
+                    )
+                    .frame(maxWidth: .infinity, minHeight: 150)
+                } else {
+                    VStack(spacing: 0) {
+                        ForEach(store.bowelMovements) { record in
+                            bowelMovementRow(record)
+                            if record.id != store.bowelMovements.last?.id {
+                                Divider()
+                            }
+                        }
+                    }
                 }
             }
         }
-    }
-
-    private var statusBanner: some View {
-        HStack(spacing: 12) {
-            Text(statusEmoji)
-                .font(.title2)
-            VStack(alignment: .leading, spacing: 2) {
-                Text(statusTitle)
-                    .font(.headline)
-                Text(DakaFormatters.day(selectedDate))
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-            Spacer()
-        }
-        .padding(13)
-        .background(statusColor.opacity(0.10), in: RoundedRectangle(cornerRadius: 12))
     }
 
     private func bowelMovementRow(_ record: BowelMovementRecord) -> some View {
         HStack(spacing: 14) {
             Text("💩")
                 .font(.title2)
-            VStack(alignment: .leading, spacing: 3) {
-                Text(DakaFormatters.time(record.occurredAt))
-                    .font(.body.weight(.semibold).monospacedDigit())
-                Text(record.note.isEmpty ? "无描述" : record.note)
-                    .foregroundStyle(record.note.isEmpty ? .tertiary : .secondary)
-                    .lineLimit(2)
-            }
+                .accessibilityHidden(true)
+            Text(DakaFormatters.deepLinkDate(record.occurredAt))
+                .font(.body.weight(.semibold).monospacedDigit())
+                .frame(width: 100, alignment: .leading)
+            Text(DakaFormatters.time(record.occurredAt))
+                .font(.body.monospacedDigit())
+                .frame(width: 52, alignment: .leading)
+            Text(record.note.isEmpty ? "无描述" : record.note)
+                .foregroundStyle(record.note.isEmpty ? .tertiary : .secondary)
+                .lineLimit(1)
             Spacer()
             Button {
                 editorRequest = .edit(record)
@@ -213,12 +162,14 @@ struct BowelMovementView: View {
                 Image(systemName: "pencil")
             }
             .help("编辑")
+            .accessibilityLabel("编辑 \(DakaFormatters.deepLinkDate(record.occurredAt)) \(DakaFormatters.time(record.occurredAt)) 的记录")
             Button(role: .destructive) {
                 pendingDeletion = record
             } label: {
                 Image(systemName: "trash")
             }
             .help("删除")
+            .accessibilityLabel("删除 \(DakaFormatters.deepLinkDate(record.occurredAt)) \(DakaFormatters.time(record.occurredAt)) 的记录")
         }
         .padding(.vertical, 10)
     }
@@ -226,55 +177,6 @@ struct BowelMovementView: View {
     private var todayStatusText: String {
         let count = store.bowelMovementCount(on: .now)
         return count == 0 ? "今天还没有记录" : "今天已经记录 \(count) 次"
-    }
-
-    private var statusTitle: String {
-        switch selectedStatus {
-        case let .recorded(count): "当天记录 \(count) 次"
-        case .noMovement: "没拉"
-        case .pending: "今天还没记录"
-        case .future: "未来日期"
-        }
-    }
-
-    private var statusEmoji: String {
-        switch selectedStatus {
-        case .recorded: "💩"
-        case .noMovement: "—"
-        case .pending: "⏳"
-        case .future: "○"
-        }
-    }
-
-    private var statusColor: Color {
-        switch selectedStatus {
-        case .recorded: .brown
-        case .noMovement: .red
-        case .pending: .orange
-        case .future: .secondary
-        }
-    }
-
-    private var emptyTitle: String {
-        selectedStatus == .noMovement ? "没拉" : "没有粑粑记录"
-    }
-
-    private var emptyIcon: String {
-        selectedStatus == .noMovement ? "xmark.circle" : "tray"
-    }
-
-    private var emptyDescription: String {
-        selectedStatus == .future
-            ? "未来日期不能补录。"
-            : "可以点击“补录一次”添加记录。"
-    }
-
-    private func moveSelectedDate(by value: Int) {
-        selectedDate = Calendar.autoupdatingCurrent.date(
-            byAdding: .day,
-            value: value,
-            to: selectedDate
-        ) ?? selectedDate
     }
 }
 
