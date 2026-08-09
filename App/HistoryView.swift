@@ -178,6 +178,7 @@ struct CycleCalendarView: View {
                         CalendarDayCell(
                             day: day,
                             record: store.record(on: day),
+                            bowelMovementCount: store.bowelMovementCount(on: day),
                             compact: compact,
                             onOpen: {
                                 store.openEditor(on: day)
@@ -249,6 +250,7 @@ private struct CalendarLegend: View {
 private struct CalendarDayCell: View {
     let day: Date
     let record: AttendanceRecord?
+    let bowelMovementCount: Int
     let compact: Bool
     let onOpen: () -> Void
     let onToggleSlacking: () -> Void
@@ -299,6 +301,11 @@ private struct CalendarDayCell: View {
                     HStack(alignment: .firstTextBaseline) {
                         Text(dayLabel)
                         .font(.subheadline.weight(.semibold).monospacedDigit())
+                        if bowelMovementCount > 0 {
+                            Text(bowelBadge)
+                                .font(.caption2)
+                                .accessibilityLabel("当天粑粑 \(bowelMovementCount) 次")
+                        }
                         Spacer()
                     }
                     Spacer(minLength: 0)
@@ -364,6 +371,13 @@ private struct CalendarDayCell: View {
             )
         }
         return day.formatted(.dateTime.day())
+    }
+
+    private var bowelBadge: String {
+        if bowelMovementCount <= 3 {
+            return String(repeating: "💩", count: bowelMovementCount)
+        }
+        return "💩×\(bowelMovementCount)"
     }
 }
 

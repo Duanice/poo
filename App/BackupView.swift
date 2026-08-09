@@ -27,7 +27,7 @@ struct BackupView: View {
                     VStack(alignment: .leading, spacing: 16) {
                         Label("完整备份", systemImage: "externaldrive.badge.plus")
                             .font(.headline)
-                        Text("JSON 备份包含手动记录、实验室实际数据、备注和记录元数据，可用于完整恢复。")
+                        Text("JSON 备份包含打卡记录、实验室实际数据和粑粑记录，可用于完整恢复。")
                             .foregroundStyle(.secondary)
                         HStack {
                             Button("导出 JSON 备份") {
@@ -50,6 +50,9 @@ struct BackupView: View {
                         Button("导出 CSV") {
                             exportCSV()
                         }
+                        Button("导出粑粑 CSV") {
+                            exportBowelCSV()
+                        }
                     }
                 }
 
@@ -61,7 +64,7 @@ struct BackupView: View {
                         VStack(alignment: .leading, spacing: 5) {
                             Text("隐私说明")
                                 .font(.headline)
-                            Text("所有打卡数据默认仅保存在你的 Mac。本应用没有账号系统、广告、统计代码或网络上传功能。")
+                            Text("所有打卡和粑粑数据默认仅保存在你的 Mac。本应用没有账号系统、广告、统计代码或网络上传功能。")
                                 .foregroundStyle(.secondary)
                         }
                     }
@@ -115,7 +118,10 @@ struct BackupView: View {
     private func exportJSON() {
         do {
             exportDocument = DakaExportDocument(
-                data: try BackupService.jsonData(records: store.records)
+                data: try BackupService.jsonData(
+                    records: store.records,
+                    bowelMovements: store.bowelMovements
+                )
             )
             exportType = .json
             exportFilename = "daka-backup-\(DakaFormatters.exportTimestamp())"
@@ -131,6 +137,15 @@ struct BackupView: View {
         )
         exportType = .commaSeparatedText
         exportFilename = "daka-records-\(DakaFormatters.exportTimestamp())"
+        showingExporter = true
+    }
+
+    private func exportBowelCSV() {
+        exportDocument = DakaExportDocument(
+            data: BackupService.bowelCSVData(records: store.bowelMovements)
+        )
+        exportType = .commaSeparatedText
+        exportFilename = "daka-bowel-records-\(DakaFormatters.exportTimestamp())"
         showingExporter = true
     }
 
@@ -153,9 +168,12 @@ struct BackupView: View {
     private func restorePendingBackup() {
         guard let pendingImport else { return }
         do {
-            _ = try BackupService.writeAutomaticBackup(records: store.records)
-            try store.replaceAll(with: pendingImport.records)
-            statusMessage = "已恢复 \(pendingImport.records.count) 条记录"
+            _ = try BackupService.writeAutomaticBackup(
+                records: store.records,
+                bowelMovements: store.bowelMovements
+            )
+            try store.replaceAll(with: pendingImport)
+            statusMessage = "备份恢复完成"
             self.pendingImport = nil
         } catch {
             store.errorMessage = "恢复失败：\(error.localizedDescription)"

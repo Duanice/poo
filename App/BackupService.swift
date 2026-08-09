@@ -35,33 +35,62 @@ struct BackupRecord: Codable, Sendable {
     }
 }
 
+struct BowelMovementBackupRecord: Codable, Sendable {
+    let id: UUID
+    let occurredAt: Date
+    let note: String
+    let createdAt: Date
+    let updatedAt: Date
+
+    init(record: BowelMovementRecord) {
+        id = record.id
+        occurredAt = record.occurredAt
+        note = record.note
+        createdAt = record.createdAt
+        updatedAt = record.updatedAt
+    }
+}
+
 struct BackupEnvelope: Codable, Sendable {
     let formatVersion: Int
     let exportedAt: Date
     let appName: String
     let records: [BackupRecord]
+    let bowelMovements: [BowelMovementBackupRecord]?
 
-    init(records: [AttendanceRecord]) {
-        formatVersion = 3
+    init(
+        records: [AttendanceRecord],
+        bowelMovements: [BowelMovementRecord] = []
+    ) {
+        formatVersion = 4
         exportedAt = .now
         appName = "中关村实验室打卡 for 段冰洁"
         self.records = records.map(BackupRecord.init)
+        self.bowelMovements = bowelMovements.map(BowelMovementBackupRecord.init)
     }
 }
 
 enum BackupService {
-    static func jsonData(records: [AttendanceRecord]) throws -> Data {
+    static func jsonData(
+        records: [AttendanceRecord],
+        bowelMovements: [BowelMovementRecord] = []
+    ) throws -> Data {
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
         encoder.dateEncodingStrategy = .iso8601
-        return try encoder.encode(BackupEnvelope(records: records))
+        return try encoder.encode(
+            BackupEnvelope(
+                records: records,
+                bowelMovements: bowelMovements
+            )
+        )
     }
 
     static func decode(_ data: Data) throws -> BackupEnvelope {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
         let envelope = try decoder.decode(BackupEnvelope.self, from: data)
-        guard (1...3).contains(envelope.formatVersion) else {
+        guard (1...4).contains(envelope.formatVersion) else {
             throw BackupError.unsupportedVersion(envelope.formatVersion)
         }
         return envelope
@@ -93,7 +122,26 @@ enum BackupService {
             .data(using: .utf8) ?? Data()
     }
 
-    static func writeAutomaticBackup(records: [AttendanceRecord]) throws -> URL {
+    static func bowelCSVData(records: [BowelMovementRecord]) -> Data {
+        var lines = ["日期,时间,描述,创建时间,最后修改时间"]
+        for record in records.sorted(by: { $0.occurredAt < $1.occurredAt }) {
+            let columns = [
+                record.occurredAt.formatted(.iso8601.year().month().day()),
+                DakaFormatters.time(record.occurredAt),
+                record.note,
+                record.createdAt.formatted(.iso8601),
+                record.updatedAt.formatted(.iso8601)
+            ].map(csvEscape)
+            lines.append(columns.joined(separator: ","))
+        }
+        return ("\u{FEFF}" + lines.joined(separator: "\n"))
+            .data(using: .utf8) ?? Data()
+    }
+
+    static func writeAutomaticBackup(
+        records: [AttendanceRecord],
+        bowelMovements: [BowelMovementRecord] = []
+    ) throws -> URL {
         let applicationSupport = try FileManager.default.url(
             for: .applicationSupportDirectory,
             in: .userDomainMask,
@@ -111,7 +159,10 @@ enum BackupService {
             path: "auto-\(DakaFormatters.exportTimestamp())-"
                 + "\(UUID().uuidString.prefix(8)).daka-backup.json"
         )
-        try jsonData(records: records).write(to: url, options: .atomic)
+        try jsonData(
+            records: records,
+            bowelMovements: bowelMovements
+        ).write(to: url, options: .atomic)
         return url
     }
 

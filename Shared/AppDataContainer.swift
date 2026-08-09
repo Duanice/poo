@@ -3,7 +3,10 @@ import SwiftData
 
 enum AppDataContainer {
     static func make(inMemory: Bool = false) throws -> ModelContainer {
-        let schema = Schema([AttendanceRecord.self])
+        let schema = Schema([
+            AttendanceRecord.self,
+            BowelMovementRecord.self
+        ])
         let configuration: ModelConfiguration
         if inMemory {
             configuration = ModelConfiguration(

@@ -31,6 +31,7 @@ private struct UndoRecordSnapshot {
 @MainActor
 final class AttendanceStore: ObservableObject {
     @Published private(set) var records: [AttendanceRecord] = []
+    @Published private(set) var bowelMovements: [BowelMovementRecord] = []
     @Published private(set) var changeToken = UUID()
     @Published var errorMessage: String?
     @Published var feedback: AppFeedback?
@@ -96,14 +97,36 @@ final class AttendanceStore: ObservableObject {
         records.first { calendar.isDate($0.workDate, inSameDayAs: date) }
     }
 
+    func bowelMovements(on date: Date) -> [BowelMovementRecord] {
+        bowelMovements.filter {
+            calendar.isDate($0.occurredAt, inSameDayAs: date)
+        }
+    }
+
+    func bowelMovementCount(on date: Date) -> Int {
+        bowelMovements(on: date).count
+    }
+
+    func bowelDayStatus(on date: Date, now: Date = .now) -> BowelDayStatus {
+        BowelDayStatusResolver.status(
+            on: date,
+            records: bowelMovements,
+            now: now,
+            calendar: calendar
+        )
+    }
+
     func refresh() {
         do {
             var descriptor = FetchDescriptor<AttendanceRecord>()
             descriptor.sortBy = [SortDescriptor(\.workDate, order: .reverse)]
             records = try modelContext.fetch(descriptor)
+            var bowelDescriptor = FetchDescriptor<BowelMovementRecord>()
+            bowelDescriptor.sortBy = [SortDescriptor(\.occurredAt, order: .reverse)]
+            bowelMovements = try modelContext.fetch(bowelDescriptor)
             changeToken = UUID()
         } catch {
-            errorMessage = "读取打卡记录失败：\(error.localizedDescription)"
+            errorMessage = "读取本地记录失败：\(error.localizedDescription)"
             return
         }
 
@@ -141,6 +164,51 @@ final class AttendanceStore: ObservableObject {
             return true
         } catch {
             errorMessage = error.localizedDescription
+            return false
+        }
+    }
+
+    @discardableResult
+    func saveBowelMovement(
+        id: UUID? = nil,
+        occurredAt: Date,
+        note: String
+    ) -> Bool {
+        do {
+            let item = try BowelMovementMutationService(
+                context: modelContext
+            ).save(
+                id: id,
+                occurredAt: occurredAt,
+                note: note
+            )
+            refresh()
+            presentFeedback(
+                title: id == nil ? "粑粑记录已添加 💩" : "粑粑记录已更新",
+                detail: DakaFormatters.day(item.occurredAt),
+                style: .success
+            )
+            return true
+        } catch {
+            errorMessage = error.localizedDescription
+            return false
+        }
+    }
+
+    @discardableResult
+    func deleteBowelMovement(id: UUID) -> Bool {
+        do {
+            try BowelMovementMutationService(
+                context: modelContext
+            ).delete(id: id)
+            refresh()
+            presentFeedback(
+                title: "粑粑记录已删除",
+                style: .warning
+            )
+            return true
+        } catch {
+            errorMessage = "删除粑粑记录失败：\(error.localizedDescription)"
             return false
         }
     }
@@ -333,38 +401,63 @@ final class AttendanceStore: ObservableObject {
             refresh()
         case "import":
             requestedDestination = .actualImport
+        case "bowel":
+            requestedDestination = .bowelMovement
         default:
             break
         }
     }
 
-    func replaceAll(with items: [BackupRecord]) throws {
-        let existing = try modelContext.fetch(FetchDescriptor<AttendanceRecord>())
-        existing.forEach(modelContext.delete)
-        for item in items {
-            modelContext.insert(
-                AttendanceRecord(
-                    id: item.id,
-                    workDate: item.workDate,
-                    checkIn: item.checkIn,
-                    checkOut: item.checkOut,
-                    note: item.note,
-                    isSlacking: item.isSlacking ?? false,
-                    createdAt: item.createdAt,
-                    updatedAt: item.updatedAt,
-                    actualCheckIn: item.actualCheckIn,
-                    actualCheckOut: item.actualCheckOut,
-                    actualDurationMinutes: item.actualDurationMinutes,
-                    actualImportedAt: item.actualImportedAt,
-                    actualImportBatchID: item.actualImportBatchID
+    func replaceAll(with backup: BackupEnvelope) throws {
+        do {
+            let existing = try modelContext.fetch(FetchDescriptor<AttendanceRecord>())
+            existing.forEach(modelContext.delete)
+            for item in backup.records {
+                modelContext.insert(
+                    AttendanceRecord(
+                        id: item.id,
+                        workDate: item.workDate,
+                        checkIn: item.checkIn,
+                        checkOut: item.checkOut,
+                        note: item.note,
+                        isSlacking: item.isSlacking ?? false,
+                        createdAt: item.createdAt,
+                        updatedAt: item.updatedAt,
+                        actualCheckIn: item.actualCheckIn,
+                        actualCheckOut: item.actualCheckOut,
+                        actualDurationMinutes: item.actualDurationMinutes,
+                        actualImportedAt: item.actualImportedAt,
+                        actualImportBatchID: item.actualImportBatchID
+                    )
                 )
-            )
+            }
+
+            if backup.formatVersion >= 4 {
+                let existingBowelMovements = try modelContext.fetch(
+                    FetchDescriptor<BowelMovementRecord>()
+                )
+                existingBowelMovements.forEach(modelContext.delete)
+                for item in backup.bowelMovements ?? [] {
+                    modelContext.insert(
+                        BowelMovementRecord(
+                            id: item.id,
+                            occurredAt: item.occurredAt,
+                            note: item.note,
+                            createdAt: item.createdAt,
+                            updatedAt: item.updatedAt
+                        )
+                    )
+                }
+            }
+            try modelContext.save()
+        } catch {
+            modelContext.rollback()
+            throw error
         }
-        try modelContext.save()
         didMutate()
         presentFeedback(
             title: "备份恢复完成",
-            detail: "已恢复 \(items.count) 条记录",
+            detail: restoreFeedbackDetail(for: backup),
             style: .success
         )
     }
@@ -372,7 +465,10 @@ final class AttendanceStore: ObservableObject {
     func importLabAttendance(
         _ rows: [LabAttendanceImportRow]
     ) throws -> LabAttendanceImportApplyResult {
-        _ = try BackupService.writeAutomaticBackup(records: records)
+        _ = try BackupService.writeAutomaticBackup(
+            records: records,
+            bowelMovements: bowelMovements
+        )
         let result = try LabAttendanceImportService(
             context: modelContext,
             calendar: calendar
@@ -418,6 +514,15 @@ final class AttendanceStore: ObservableObject {
 
     private func didMutate() {
         refresh()
+    }
+
+    private func restoreFeedbackDetail(for backup: BackupEnvelope) -> String {
+        if backup.formatVersion >= 4 {
+            return "已恢复 \(backup.records.count) 条打卡记录、"
+                + "\(backup.bowelMovements?.count ?? 0) 条粑粑记录"
+        }
+        return "已恢复 \(backup.records.count) 条打卡记录；"
+            + "旧版备份不含粑粑数据，现有粑粑记录已保留"
     }
 
     private func restoreFromWidgetSnapshotIfNeeded() throws {

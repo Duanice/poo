@@ -39,8 +39,8 @@ targets:
       properties:
         CFBundleName: Daka
         CFBundleDisplayName: "中关村实验室打卡 for 段冰洁"
-        CFBundleShortVersionString: "1.2.1"
-        CFBundleVersion: "6"
+        CFBundleShortVersionString: "1.3.0"
+        CFBundleVersion: "7"
         LSMinimumSystemVersion: "14.0"
         NSHumanReadableCopyright: "Copyright © 2026 Duanice."
         CFBundleURLTypes:
@@ -69,8 +69,8 @@ targets:
       path: Widget/Info.plist
       properties:
         CFBundleDisplayName: "中关村实验室打卡"
-        CFBundleShortVersionString: "1.2.1"
-        CFBundleVersion: "6"
+        CFBundleShortVersionString: "1.3.0"
+        CFBundleVersion: "7"
         NSExtension:
           NSExtensionPointIdentifier: com.apple.widgetkit-extension
 

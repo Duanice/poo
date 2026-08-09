@@ -4,6 +4,7 @@ enum SidebarDestination: String, CaseIterable, Identifiable {
     case overview = "概览"
     case history = "历史记录"
     case actualImport = "实际数据批量更新"
+    case bowelMovement = "粑粑记录"
     case backup = "备份与导出"
     case settings = "设置"
 
@@ -14,6 +15,7 @@ enum SidebarDestination: String, CaseIterable, Identifiable {
         case .overview: "gauge.with.dots.needle.67percent"
         case .history: "calendar"
         case .actualImport: "building.2.crop.circle"
+        case .bowelMovement: "heart.text.clipboard"
         case .backup: "externaldrive.badge.timemachine"
         case .settings: "gearshape"
         }
@@ -42,6 +44,8 @@ struct ContentView: View {
                         HistoryView()
                     case .actualImport:
                         LabAttendanceImportView()
+                    case .bowelMovement:
+                        BowelMovementView()
                     case .backup:
                         BackupView()
                     case .settings:

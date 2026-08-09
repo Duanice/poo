@@ -294,7 +294,7 @@ final class LabAttendanceImportServiceTests: XCTestCase {
         XCTAssertEqual(record.durationMinutes, 0)
     }
 
-    func testVersionThreeBackupPreservesActualData() throws {
+    func testVersionFourBackupPreservesActualData() throws {
         let record = AttendanceRecord(
             workDate: makeDate(2026, 7, 4, 0, 0),
             checkIn: makeDate(2026, 7, 4, 10, 0),
@@ -311,7 +311,7 @@ final class LabAttendanceImportServiceTests: XCTestCase {
         )
         let restored = try XCTUnwrap(backup.records.first)
 
-        XCTAssertEqual(backup.formatVersion, 3)
+        XCTAssertEqual(backup.formatVersion, 4)
         XCTAssertEqual(restored.actualCheckIn, record.actualCheckIn)
         XCTAssertEqual(restored.actualCheckOut, record.actualCheckOut)
         XCTAssertEqual(restored.actualDurationMinutes, 520)
