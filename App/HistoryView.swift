@@ -286,6 +286,12 @@ private struct CalendarDayCell: View {
         return "未记录"
     }
 
+    private var timeRange: String? {
+        guard let record, record.hasAnyEffectiveTime else { return nil }
+        return "\(DakaFormatters.time(record.effectiveCheckIn))–"
+            + DakaFormatters.time(record.effectiveCheckOut)
+    }
+
     var body: some View {
         ZStack(alignment: .topTrailing) {
             Button(action: onOpen) {
@@ -296,6 +302,13 @@ private struct CalendarDayCell: View {
                         Spacer()
                     }
                     Spacer(minLength: 0)
+                    if let timeRange {
+                        Text(timeRange)
+                            .font(.caption2.monospacedDigit())
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.7)
+                    }
                     HStack(spacing: 4) {
                         if record?.isSlacking == true {
                             Image(systemName: "moon.zzz.fill")
