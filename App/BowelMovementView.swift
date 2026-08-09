@@ -142,7 +142,7 @@ struct BowelMovementView: View {
     }
 
     private func bowelMovementRow(_ record: BowelMovementRecord) -> some View {
-        HStack(spacing: 14) {
+        HStack(alignment: .top, spacing: 14) {
             Text("💩")
                 .font(.title2)
                 .accessibilityHidden(true)
@@ -154,7 +154,6 @@ struct BowelMovementView: View {
                 .frame(width: 52, alignment: .leading)
             Text(record.note.isEmpty ? "无描述" : record.note)
                 .foregroundStyle(record.note.isEmpty ? .tertiary : .secondary)
-                .lineLimit(1)
             Spacer()
             Button {
                 editorRequest = .edit(record)
