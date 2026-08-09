@@ -138,15 +138,19 @@ struct RecordEditorSheet: View {
             .padding(.top, 18)
 
             ScrollView {
-                TodayEditorView(
-                    workDate: date,
-                    record: store.record(on: date),
-                    title: "编辑打卡记录",
-                    onFinished: {
-                        store.editRequest = nil
-                    }
-                )
-                .id(store.changeToken)
+                VStack(spacing: 16) {
+                    TodayEditorView(
+                        workDate: date,
+                        record: store.record(on: date),
+                        title: "编辑打卡记录",
+                        onFinished: {
+                            store.editRequest = nil
+                        }
+                    )
+                    .id(store.changeToken)
+
+                    BowelMovementDayEditorCard(date: date)
+                }
                 .padding(24)
             }
         }

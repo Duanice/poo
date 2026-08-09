@@ -154,7 +154,7 @@ struct CycleCalendarView: View {
                 VStack(alignment: .leading, spacing: 3) {
                     Text("周期日历")
                         .font(.headline)
-                    Text("点击日期编辑，点击月亮图标一键设置摆烂")
+                    Text("点击日期编辑打卡和粑粑，点击月亮图标一键设置摆烂")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }

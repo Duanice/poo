@@ -4,7 +4,6 @@ import UniformTypeIdentifiers
 struct BowelMovementView: View {
     @EnvironmentObject private var store: AttendanceStore
 
-    @State private var quickNote = ""
     @State private var selectedDate = Date.now
     @State private var editorRequest: BowelMovementEditorRequest?
     @State private var pendingDeletion: BowelMovementRecord?
@@ -37,8 +36,10 @@ struct BowelMovementView: View {
             .frame(maxWidth: .infinity)
         }
         .sheet(item: $editorRequest) { request in
-            BowelMovementEditorSheet(request: request)
-                .environmentObject(store)
+            BowelMovementEditorSheet(request: request) { occurredAt in
+                selectedDate = occurredAt
+            }
+            .environmentObject(store)
         }
         .confirmationDialog(
             "确定删除这条粑粑记录吗？",
@@ -88,26 +89,15 @@ struct BowelMovementView: View {
                         .accessibilityHidden(true)
                 }
 
-                TextField("描述（可选，例如状态、感受）", text: $quickNote, axis: .vertical)
-                    .textFieldStyle(.roundedBorder)
-                    .lineLimit(2...4)
-
                 HStack {
-                    Text("描述最多 500 字")
+                    Text("默认使用当前时间，保存前可以修改日期、时间和描述。")
                         .font(.caption)
-                        .foregroundStyle(quickNote.count > 500 ? .red : .secondary)
+                        .foregroundStyle(.secondary)
                     Spacer()
                     Button("记录一次 💩") {
-                        if store.saveBowelMovement(
-                            occurredAt: .now,
-                            note: quickNote
-                        ) {
-                            quickNote = ""
-                            selectedDate = .now
-                        }
+                        editorRequest = .new(on: .now)
                     }
                     .buttonStyle(.borderedProminent)
-                    .disabled(quickNote.count > 500)
                 }
             }
         }
@@ -288,7 +278,7 @@ struct BowelMovementView: View {
     }
 }
 
-private struct BowelMovementEditorRequest: Identifiable {
+struct BowelMovementEditorRequest: Identifiable {
     let id = UUID()
     let recordID: UUID?
     let occurredAt: Date
@@ -315,16 +305,21 @@ private struct BowelMovementEditorRequest: Identifiable {
     }
 }
 
-private struct BowelMovementEditorSheet: View {
+struct BowelMovementEditorSheet: View {
     @EnvironmentObject private var store: AttendanceStore
     @Environment(\.dismiss) private var dismiss
 
     let request: BowelMovementEditorRequest
+    var onSaved: ((Date) -> Void)?
     @State private var occurredAt: Date
     @State private var note: String
 
-    init(request: BowelMovementEditorRequest) {
+    init(
+        request: BowelMovementEditorRequest,
+        onSaved: ((Date) -> Void)? = nil
+    ) {
         self.request = request
+        self.onSaved = onSaved
         _occurredAt = State(initialValue: request.occurredAt)
         _note = State(initialValue: request.note)
     }
@@ -373,6 +368,7 @@ private struct BowelMovementEditorSheet: View {
                         occurredAt: occurredAt,
                         note: note
                     ) {
+                        onSaved?(occurredAt)
                         dismiss()
                     }
                 }
@@ -382,5 +378,73 @@ private struct BowelMovementEditorSheet: View {
         }
         .padding(24)
         .frame(width: 520)
+    }
+}
+
+struct BowelMovementDayEditorCard: View {
+    @EnvironmentObject private var store: AttendanceStore
+
+    let date: Date
+    @State private var editorRequest: BowelMovementEditorRequest?
+
+    private var records: [BowelMovementRecord] {
+        store.bowelMovements(on: date)
+    }
+
+    private var isFuture: Bool {
+        Calendar.current.startOfDay(for: date)
+            > Calendar.current.startOfDay(for: .now)
+    }
+
+    var body: some View {
+        Card {
+            VStack(alignment: .leading, spacing: 14) {
+                HStack {
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text("粑粑记录")
+                            .font(.headline)
+                        Text(records.isEmpty ? emptyStatus : "当天记录 \(records.count) 次")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Button(records.isEmpty ? "记录一次 💩" : "再记录一次 💩") {
+                        editorRequest = .new(on: date)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .disabled(isFuture)
+                }
+
+                ForEach(records) { record in
+                    Button {
+                        editorRequest = .edit(record)
+                    } label: {
+                        HStack(spacing: 12) {
+                            Text("💩")
+                            Text(DakaFormatters.time(record.occurredAt))
+                                .font(.body.weight(.semibold).monospacedDigit())
+                            Text(record.note.isEmpty ? "无描述" : record.note)
+                                .foregroundStyle(.secondary)
+                                .lineLimit(1)
+                            Spacer()
+                            Image(systemName: "pencil")
+                                .foregroundStyle(.secondary)
+                        }
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+        }
+        .sheet(item: $editorRequest) { request in
+            BowelMovementEditorSheet(request: request)
+                .environmentObject(store)
+        }
+    }
+
+    private var emptyStatus: String {
+        if isFuture { return "未来日期不能记录" }
+        if Calendar.current.isDateInToday(date) { return "今天还没记录" }
+        return "没拉"
     }
 }

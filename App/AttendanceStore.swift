@@ -121,9 +121,7 @@ final class AttendanceStore: ObservableObject {
             var descriptor = FetchDescriptor<AttendanceRecord>()
             descriptor.sortBy = [SortDescriptor(\.workDate, order: .reverse)]
             records = try modelContext.fetch(descriptor)
-            var bowelDescriptor = FetchDescriptor<BowelMovementRecord>()
-            bowelDescriptor.sortBy = [SortDescriptor(\.occurredAt, order: .reverse)]
-            bowelMovements = try modelContext.fetch(bowelDescriptor)
+            try refreshBowelMovements()
             changeToken = UUID()
         } catch {
             errorMessage = "读取本地记录失败：\(error.localizedDescription)"
@@ -182,7 +180,7 @@ final class AttendanceStore: ObservableObject {
                 occurredAt: occurredAt,
                 note: note
             )
-            refresh()
+            try refreshBowelMovements()
             presentFeedback(
                 title: id == nil ? "粑粑记录已添加 💩" : "粑粑记录已更新",
                 detail: DakaFormatters.day(item.occurredAt),
@@ -201,7 +199,7 @@ final class AttendanceStore: ObservableObject {
             try BowelMovementMutationService(
                 context: modelContext
             ).delete(id: id)
-            refresh()
+            try refreshBowelMovements()
             presentFeedback(
                 title: "粑粑记录已删除",
                 style: .warning
@@ -514,6 +512,12 @@ final class AttendanceStore: ObservableObject {
 
     private func didMutate() {
         refresh()
+    }
+
+    private func refreshBowelMovements() throws {
+        var descriptor = FetchDescriptor<BowelMovementRecord>()
+        descriptor.sortBy = [SortDescriptor(\.occurredAt, order: .reverse)]
+        bowelMovements = try modelContext.fetch(descriptor)
     }
 
     private func restoreFeedbackDetail(for backup: BackupEnvelope) -> String {
