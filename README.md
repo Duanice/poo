@@ -85,13 +85,13 @@
 应用不包含服务器、账号系统、广告或统计 SDK。原始数据库默认保存在主应用的 macOS 沙盒容器：
 
 ```text
-~/Library/Containers/com.duanice.daka/Data/Library/Application Support/
+~/Library/Containers/com.duanice.poo/Data/Library/Application Support/
 ```
 
 桌面组件所需的只读快照位于：
 
 ```text
-~/Library/Application Support/com.duanice.daka/widget-snapshot-v1.json
+~/Library/Application Support/com.duanice.poo/widget-snapshot-v1.json
 ```
 
 快照仅包含计算 Widget 所需的日期、有效上下班时间、实验室实际时长、摆烂状态和周期目标，不包含粑粑记录。文件权限为当前用户可读写。Widget 不直接打开 SwiftData 数据库，因此不依赖付费开发者账号提供的 App Groups 能力。个人数据库、快照、导出文件、备份文件和签名证书都已排除在 Git 版本控制之外。
@@ -157,4 +157,4 @@ Tools/      可复现的图标生成和领域层冒烟测试工具
 
 ## 版本
 
-当前版本：`1.3.3`
+当前版本：`1.4.0`

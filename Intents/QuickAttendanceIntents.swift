@@ -8,7 +8,7 @@ struct QuickCheckInIntent: AppIntent {
 
     func perform() async throws -> some IntentResult & OpensIntent & ProvidesDialog {
         .result(
-            opensIntent: OpenURLIntent(URL(string: "daka://quick/check-in")!),
+            opensIntent: OpenURLIntent(URL(string: "poo://quick/check-in")!),
             dialog: "正在打开打卡应用并记录上班时间"
         )
     }
@@ -22,7 +22,7 @@ struct QuickCheckOutIntent: AppIntent {
 
     func perform() async throws -> some IntentResult & OpensIntent & ProvidesDialog {
         .result(
-            opensIntent: OpenURLIntent(URL(string: "daka://quick/check-out")!),
+            opensIntent: OpenURLIntent(URL(string: "poo://quick/check-out")!),
             dialog: "正在打开打卡应用并记录下班时间"
         )
     }
@@ -36,7 +36,7 @@ struct ToggleTodaySlackingIntent: AppIntent {
 
     func perform() async throws -> some IntentResult & OpensIntent & ProvidesDialog {
         .result(
-            opensIntent: OpenURLIntent(URL(string: "daka://quick/toggle-slacking")!),
+            opensIntent: OpenURLIntent(URL(string: "poo://quick/toggle-slacking")!),
             dialog: "正在打开打卡应用并切换今日摆烂状态"
         )
     }

@@ -149,7 +149,7 @@ enum BackupService {
             create: true
         )
         let directory = applicationSupport
-            .appending(path: "com.duanice.daka", directoryHint: .isDirectory)
+            .appending(path: "com.duanice.poo", directoryHint: .isDirectory)
             .appending(path: "Backups", directoryHint: .isDirectory)
         try FileManager.default.createDirectory(
             at: directory,

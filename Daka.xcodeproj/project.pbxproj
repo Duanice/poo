@@ -431,7 +431,7 @@
 					"@executable_path/../Frameworks",
 					"@executable_path/../../../../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.duanice.daka.widget;
+				PRODUCT_BUNDLE_IDENTIFIER = com.duanice.poo.widget;
 				PRODUCT_NAME = DakaWidget;
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
@@ -449,7 +449,7 @@
 					"@executable_path/../Frameworks",
 					"@loader_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.duanice.daka.tests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.duanice.poo.tests;
 				SDKROOT = macosx;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Daka.app/Contents/MacOS/Daka";
 			};
@@ -468,7 +468,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.duanice.daka;
+				PRODUCT_BUNDLE_IDENTIFIER = com.duanice.poo;
 				PRODUCT_NAME = Daka;
 				SDKROOT = macosx;
 			};
@@ -485,7 +485,7 @@
 					"@executable_path/../Frameworks",
 					"@loader_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.duanice.daka.tests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.duanice.poo.tests;
 				SDKROOT = macosx;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Daka.app/Contents/MacOS/Daka";
 			};
@@ -504,7 +504,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.duanice.daka;
+				PRODUCT_BUNDLE_IDENTIFIER = com.duanice.poo;
 				PRODUCT_NAME = Daka;
 				SDKROOT = macosx;
 			};
@@ -522,7 +522,7 @@
 					"@executable_path/../Frameworks",
 					"@executable_path/../../../../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.duanice.daka.widget;
+				PRODUCT_BUNDLE_IDENTIFIER = com.duanice.poo.widget;
 				PRODUCT_NAME = DakaWidget;
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;

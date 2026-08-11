@@ -55,7 +55,7 @@ enum WidgetSnapshotStore {
     private static let directoryComponents = [
         "Library",
         "Application Support",
-        "com.duanice.daka"
+        "com.duanice.poo"
     ]
     private static let fileName = "widget-snapshot-v1.json"
 

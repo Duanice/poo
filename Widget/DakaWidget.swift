@@ -51,7 +51,7 @@ private struct DakaWidgetView: View {
     }
 
     private var snapshotErrorBody: some View {
-        Link(destination: URL(string: "daka://sync")!) {
+        Link(destination: URL(string: "poo://sync")!) {
             VStack(alignment: .leading, spacing: 10) {
                 Label("打卡数据待同步", systemImage: "arrow.triangle.2.circlepath")
                     .font(.headline)
@@ -70,7 +70,7 @@ private struct DakaWidgetView: View {
     }
 
     private var smallBody: some View {
-        Link(destination: URL(string: "daka://today")!) {
+        Link(destination: URL(string: "poo://today")!) {
             VStack(alignment: .leading, spacing: 10) {
                 HStack {
                     Label("打卡", systemImage: "clock.badge.checkmark.fill")
@@ -119,7 +119,7 @@ private struct DakaWidgetView: View {
 
     private var mediumBody: some View {
         HStack(spacing: 18) {
-            Link(destination: URL(string: "daka://today")!) {
+            Link(destination: URL(string: "poo://today")!) {
                 VStack(alignment: .leading, spacing: 8) {
                     Label("中关村实验室打卡", systemImage: "clock.badge.checkmark.fill")
                         .font(.headline)
@@ -160,17 +160,17 @@ private struct DakaWidgetView: View {
                     .lineLimit(1)
 
                 HStack(spacing: 6) {
-                    Link(destination: URL(string: "daka://quick/check-in")!) {
+                    Link(destination: URL(string: "poo://quick/check-in")!) {
                         Label("上班", systemImage: "play.fill")
                     }
                     .buttonStyle(.bordered)
 
-                    Link(destination: URL(string: "daka://quick/check-out")!) {
+                    Link(destination: URL(string: "poo://quick/check-out")!) {
                         Label("下班", systemImage: "stop.fill")
                     }
                     .buttonStyle(.borderedProminent)
 
-                    Link(destination: URL(string: "daka://quick/toggle-slacking")!) {
+                    Link(destination: URL(string: "poo://quick/toggle-slacking")!) {
                         Image(systemName: entry.todayIsSlacking ? "arrow.uturn.backward" : "moon.zzz.fill")
                     }
                     .buttonStyle(.bordered)
@@ -232,13 +232,13 @@ private struct DakaWidgetView: View {
                 Spacer()
 
                 HStack(spacing: 8) {
-                    Link(destination: URL(string: "daka://quick/check-in")!) {
+                    Link(destination: URL(string: "poo://quick/check-in")!) {
                         Label("上班", systemImage: "play.fill")
                     }
-                    Link(destination: URL(string: "daka://quick/check-out")!) {
+                    Link(destination: URL(string: "poo://quick/check-out")!) {
                         Label("下班", systemImage: "stop.fill")
                     }
-                    Link(destination: URL(string: "daka://quick/toggle-slacking")!) {
+                    Link(destination: URL(string: "poo://quick/toggle-slacking")!) {
                         Label(
                             entry.todayIsSlacking ? "取消摆烂" : "摆烂",
                             systemImage: entry.todayIsSlacking ? "arrow.uturn.backward" : "moon.zzz.fill"
@@ -416,7 +416,7 @@ private enum DakaFormattersWidget {
             components.month ?? 0,
             components.day ?? 0
         )
-        return URL(string: "daka://record/\(value)")!
+        return URL(string: "poo://record/\(value)")!
     }
 }
 

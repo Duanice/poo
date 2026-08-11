@@ -6,7 +6,7 @@
     <true/>
     <key>com.apple.security.temporary-exception.files.home-relative-path.read-only</key>
     <array>
-        <string>/Library/Application Support/com.duanice.daka/</string>
+        <string>/Library/Application Support/com.duanice.poo/</string>
     </array>
 </dict>
 </plist>
