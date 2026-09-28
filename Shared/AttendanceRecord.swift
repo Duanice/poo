@@ -11,6 +11,7 @@ final class AttendanceRecord {
     var createdAt: Date
     var updatedAt: Date
     var isSlackingFlag: Bool?
+    var isOffsiteStudyFlag: Bool?
     var actualCheckIn: Date?
     var actualCheckOut: Date?
     var actualDurationMinutes: Int?
@@ -24,6 +25,7 @@ final class AttendanceRecord {
         checkOut: Date? = nil,
         note: String = "",
         isSlacking: Bool = false,
+        isOffsiteStudy: Bool = false,
         createdAt: Date = .now,
         updatedAt: Date = .now,
         actualCheckIn: Date? = nil,
@@ -38,6 +40,7 @@ final class AttendanceRecord {
         self.checkOut = checkOut
         self.note = note
         self.isSlackingFlag = isSlacking
+        self.isOffsiteStudyFlag = isOffsiteStudy
         self.createdAt = createdAt
         self.updatedAt = updatedAt
         self.actualCheckIn = actualCheckIn
@@ -49,6 +52,14 @@ final class AttendanceRecord {
 
     var isSlacking: Bool {
         isSlackingFlag == true
+    }
+
+    var isOffsiteStudy: Bool {
+        isOffsiteStudyFlag == true
+    }
+
+    var isExcludedFromAttendance: Bool {
+        isSlacking || isOffsiteStudy
     }
 
     var hasActualData: Bool {
@@ -70,7 +81,7 @@ final class AttendanceRecord {
     }
 
     var durationMinutes: Int {
-        guard !isSlacking else { return 0 }
+        guard !isExcludedFromAttendance else { return 0 }
         if hasActualData {
             return max(0, actualDurationMinutes ?? 0)
         }
@@ -81,7 +92,7 @@ final class AttendanceRecord {
     }
 
     var isComplete: Bool {
-        !isSlacking
+        !isExcludedFromAttendance
             && effectiveCheckIn != nil
             && effectiveCheckOut != nil
             && durationMinutes > 0
@@ -103,10 +114,11 @@ enum AttendanceSummaryBuilder {
                 durationMinutes: record?.durationMinutes ?? 0,
                 isComplete: record?.isComplete ?? false,
                 isPartial: record != nil
-                    && record?.isSlacking != true
+                    && record?.isExcludedFromAttendance != true
                     && record?.isComplete != true
                     && record?.hasAnyEffectiveTime == true,
-                isSlacking: record?.isSlacking ?? false
+                isSlacking: record?.isSlacking ?? false,
+                isOffsiteStudy: record?.isOffsiteStudy ?? false
             )
         }
     }

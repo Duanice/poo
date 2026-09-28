@@ -71,6 +71,12 @@ struct HistoryView: View {
                             color: .green
                         )
                         MetricTile(
+                            title: "外出自习",
+                            value: "\(periodRecords.filter(\.isOffsiteStudy).count) 天",
+                            icon: "book.closed.fill",
+                            color: .green
+                        )
+                        MetricTile(
                             title: "摆烂日",
                             value: "\(periodRecords.filter(\.isSlacking).count) 天",
                             icon: "moon.zzz.fill",
@@ -154,7 +160,7 @@ struct CycleCalendarView: View {
                 VStack(alignment: .leading, spacing: 3) {
                     Text("周期日历")
                         .font(.headline)
-                    Text("点击日期编辑打卡和粑粑，点击月亮图标一键设置摆烂")
+                    Text("点击日期编辑打卡、外出自习和粑粑，点击月亮图标一键设置摆烂")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -162,6 +168,7 @@ struct CycleCalendarView: View {
                 CalendarLegend(color: .blue, text: "已完成")
                 CalendarLegend(color: .cyan, text: "实验室实际")
                 CalendarLegend(color: .orange, text: "进行中")
+                CalendarLegend(color: .green, text: "外出自习")
                 CalendarLegend(color: .purple, text: "摆烂")
             }
 
@@ -259,6 +266,9 @@ private struct CalendarDayCell: View {
         if record?.isSlacking == true {
             return .purple.opacity(0.18)
         }
+        if record?.isOffsiteStudy == true {
+            return .green.opacity(0.18)
+        }
         if record?.hasActualData == true {
             return .cyan.opacity(0.22)
         }
@@ -278,6 +288,9 @@ private struct CalendarDayCell: View {
     private var detail: String {
         if record?.isSlacking == true {
             return "摆烂"
+        }
+        if record?.isOffsiteStudy == true {
+            return "外出自习"
         }
         if record?.isComplete == true {
             return AttendanceCalculator.compactDuration(record?.durationMinutes ?? 0)
@@ -319,6 +332,8 @@ private struct CalendarDayCell: View {
                     HStack(spacing: 4) {
                         if record?.isSlacking == true {
                             Image(systemName: "moon.zzz.fill")
+                        } else if record?.isOffsiteStudy == true {
+                            Image(systemName: "book.closed.fill")
                         } else if record?.hasActualData == true {
                             Image(systemName: "building.2.fill")
                         } else if record?.isComplete == true {
@@ -330,7 +345,11 @@ private struct CalendarDayCell: View {
                             .lineLimit(1)
                     }
                     .font(.caption2.weight(.medium))
-                    .foregroundStyle(record?.isSlacking == true ? .purple : .secondary)
+                    .foregroundStyle(
+                        record?.isSlacking == true
+                            ? .purple
+                            : record?.isOffsiteStudy == true ? .green : .secondary
+                    )
                     if !compact, record?.note.isEmpty == false {
                         Image(systemName: "note.text")
                             .font(.caption2)

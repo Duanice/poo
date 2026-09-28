@@ -16,7 +16,8 @@ struct DashboardView: View {
                 ProgressSummaryCard(
                     period: store.currentPeriod,
                     completedMinutes: store.currentTotalMinutes,
-                    targetMinutes: AppSettingsSnapshot.load().targetMinutes
+                    targetMinutes: AppSettingsSnapshot.load().targetMinutes,
+                    offsiteStudyDays: store.currentPeriodRecords.filter(\.isOffsiteStudy).count
                 )
 
                 CatchUpPlanCard()
@@ -48,6 +49,7 @@ struct DashboardView: View {
 struct CatchUpPlanCard: View {
     @EnvironmentObject private var store: AttendanceStore
     @State private var showClearConfirmation = false
+    @State private var showOffsiteStudyClearConfirmation = false
 
     private var plan: CatchUpPlan {
         store.currentCatchUpPlan
@@ -102,23 +104,45 @@ struct CatchUpPlanCard: View {
 
                 Spacer()
 
-                Button {
-                    if store.todayRecord?.isSlacking == true {
-                        _ = store.setSlacking(on: .now, enabled: false)
-                    } else if store.requiresClearingBeforeSlacking(on: .now) {
-                        showClearConfirmation = true
-                    } else {
-                        _ = store.setSlacking(on: .now, enabled: true)
+                VStack(alignment: .trailing, spacing: 8) {
+                    Button {
+                        if store.todayRecord?.isOffsiteStudy == true {
+                            _ = store.setOffsiteStudy(on: .now, enabled: false)
+                        } else if store.requiresClearingBeforeOffsiteStudy(on: .now) {
+                            showOffsiteStudyClearConfirmation = true
+                        } else {
+                            _ = store.setOffsiteStudy(on: .now, enabled: true)
+                        }
+                    } label: {
+                        Label(
+                            store.todayRecord?.isOffsiteStudy == true
+                                ? "取消外出自习"
+                                : "今天外出自习",
+                            systemImage: store.todayRecord?.isOffsiteStudy == true
+                                ? "arrow.uturn.backward"
+                                : "book.closed.fill"
+                        )
                     }
-                } label: {
-                    Label(
-                        store.todayRecord?.isSlacking == true ? "取消今日摆烂" : "今天摆烂",
-                        systemImage: store.todayRecord?.isSlacking == true
-                            ? "arrow.uturn.backward"
-                            : "moon.zzz.fill"
-                    )
+                    .tint(.green)
+
+                    Button {
+                        if store.todayRecord?.isSlacking == true {
+                            _ = store.setSlacking(on: .now, enabled: false)
+                        } else if store.requiresClearingBeforeSlacking(on: .now) {
+                            showClearConfirmation = true
+                        } else {
+                            _ = store.setSlacking(on: .now, enabled: true)
+                        }
+                    } label: {
+                        Label(
+                            store.todayRecord?.isSlacking == true ? "取消今日摆烂" : "今天摆烂",
+                            systemImage: store.todayRecord?.isSlacking == true
+                                ? "arrow.uturn.backward"
+                                : "moon.zzz.fill"
+                        )
+                    }
+                    .tint(.purple)
                 }
-                .tint(.purple)
                 .buttonStyle(.borderedProminent)
             }
         }
@@ -138,6 +162,22 @@ struct CatchUpPlanCard: View {
         } message: {
             Text("已有的上下班时间将被清空，可以通过反馈提示中的“撤销”恢复。")
         }
+        .confirmationDialog(
+            "今天已经存在打卡记录",
+            isPresented: $showOffsiteStudyClearConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("清空记录并设为外出自习", role: .destructive) {
+                _ = store.setOffsiteStudy(
+                    on: .now,
+                    enabled: true,
+                    clearExistingRecord: true
+                )
+            }
+            Button("取消", role: .cancel) {}
+        } message: {
+            Text("已有的上下班时间将被清空，可以通过反馈提示中的“撤销”恢复。")
+        }
     }
 }
 
@@ -145,6 +185,7 @@ struct ProgressSummaryCard: View {
     let period: AttendancePeriod
     let completedMinutes: Int
     let targetMinutes: Int
+    let offsiteStudyDays: Int
 
     private var progress: Double {
         guard targetMinutes > 0 else { return 0 }
@@ -210,6 +251,7 @@ struct ProgressSummaryCard: View {
                             color: remainingMinutes == 0 ? .green : .blue
                         )
                         StatusPill(text: "剩余 \(remainingDays) 天", color: .secondary)
+                        StatusPill(text: "外出自习 \(offsiteStudyDays) 天", color: .green)
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)

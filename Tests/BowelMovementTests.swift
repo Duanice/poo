@@ -113,7 +113,7 @@ final class BowelMovementTests: XCTestCase {
         }
     }
 
-    func testVersionFourBackupPreservesBowelMovements() throws {
+    func testVersionFiveBackupPreservesBowelMovements() throws {
         let first = BowelMovementRecord(
             occurredAt: makeDate(2026, 8, 7, 9, 10),
             note: "第一次"
@@ -130,7 +130,7 @@ final class BowelMovementTests: XCTestCase {
             )
         )
 
-        XCTAssertEqual(backup.formatVersion, 4)
+        XCTAssertEqual(backup.formatVersion, 5)
         XCTAssertEqual(backup.bowelMovements?.count, 2)
         XCTAssertEqual(backup.bowelMovements?.map(\.note), ["第一次", "第二次"])
     }

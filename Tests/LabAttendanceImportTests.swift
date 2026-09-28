@@ -294,7 +294,36 @@ final class LabAttendanceImportServiceTests: XCTestCase {
         XCTAssertEqual(record.durationMinutes, 0)
     }
 
-    func testVersionFourBackupPreservesActualData() throws {
+    func testActualImportReturnsOffsiteStudyDayToNormalAttendance() throws {
+        let container = try AppDataContainer.make(inMemory: true)
+        let context = ModelContext(container)
+        let importService = LabAttendanceImportService(
+            context: context,
+            calendar: calendar
+        )
+        let mutationService = AttendanceMutationService(
+            context: context,
+            calendar: calendar
+        )
+        let date = makeDate(2026, 7, 4, 0, 0)
+        try mutationService.setOffsiteStudy(on: date, enabled: true)
+
+        _ = try importService.apply([
+            row(
+                date: date,
+                checkInMinute: 9 * 60,
+                checkOutMinute: 18 * 60,
+                duration: 540
+            )
+        ])
+
+        let record = try XCTUnwrap(mutationService.record(on: date))
+        XCTAssertFalse(record.isOffsiteStudy)
+        XCTAssertTrue(record.hasActualData)
+        XCTAssertEqual(record.durationMinutes, 540)
+    }
+
+    func testVersionFiveBackupPreservesActualData() throws {
         let record = AttendanceRecord(
             workDate: makeDate(2026, 7, 4, 0, 0),
             checkIn: makeDate(2026, 7, 4, 10, 0),
@@ -311,7 +340,7 @@ final class LabAttendanceImportServiceTests: XCTestCase {
         )
         let restored = try XCTUnwrap(backup.records.first)
 
-        XCTAssertEqual(backup.formatVersion, 4)
+        XCTAssertEqual(backup.formatVersion, 5)
         XCTAssertEqual(restored.actualCheckIn, record.actualCheckIn)
         XCTAssertEqual(restored.actualCheckOut, record.actualCheckOut)
         XCTAssertEqual(restored.actualDurationMinutes, 520)

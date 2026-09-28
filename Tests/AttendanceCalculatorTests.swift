@@ -53,7 +53,8 @@ final class AttendanceCalculatorTests: XCTestCase {
                 durationMinutes: index < 15 ? 8 * 60 : 0,
                 isComplete: index < 15,
                 isPartial: false,
-                isSlacking: false
+                isSlacking: false,
+                isOffsiteStudy: false
             )
         }
         let now = date(2026, 7, 16, 10)
@@ -74,7 +75,8 @@ final class AttendanceCalculatorTests: XCTestCase {
             durationMinutes: 0,
             isComplete: false,
             isPartial: false,
-            isSlacking: true
+            isSlacking: true,
+            isOffsiteStudy: false
         )
         plan = CatchUpPlanCalculator.plan(
             period: period,
@@ -85,6 +87,24 @@ final class AttendanceCalculatorTests: XCTestCase {
         )
         XCTAssertEqual(plan.eligibleDays, 4)
         XCTAssertEqual(plan.requiredMinutesPerDay, 10 * 60)
+
+        summaries[16] = DailyAttendanceSummary(
+            date: summaries[16].date,
+            durationMinutes: 0,
+            isComplete: false,
+            isPartial: false,
+            isSlacking: false,
+            isOffsiteStudy: true
+        )
+        plan = CatchUpPlanCalculator.plan(
+            period: period,
+            summaries: summaries,
+            targetMinutes: 160 * 60,
+            now: now,
+            calendar: calendar
+        )
+        XCTAssertEqual(plan.eligibleDays, 3)
+        XCTAssertEqual(plan.requiredMinutesPerDay, 800)
     }
 
     func testCatchUpPlanReportsImpossibleWhenAllRemainingDaysAreSlacking() {
@@ -96,7 +116,8 @@ final class AttendanceCalculatorTests: XCTestCase {
                 durationMinutes: index < 15 ? 8 * 60 : 0,
                 isComplete: index < 15,
                 isPartial: false,
-                isSlacking: index >= 15
+                isSlacking: index >= 15,
+                isOffsiteStudy: false
             )
         }
 
@@ -125,7 +146,8 @@ final class AttendanceCalculatorTests: XCTestCase {
                 durationMinutes: 0,
                 isComplete: false,
                 isPartial: false,
-                isSlacking: false
+                isSlacking: false,
+                isOffsiteStudy: false
             )
         }
 

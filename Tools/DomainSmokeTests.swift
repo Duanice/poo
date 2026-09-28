@@ -69,7 +69,8 @@ struct DomainSmokeTests {
                 durationMinutes: 0,
                 isComplete: false,
                 isPartial: false,
-                isSlacking: false
+                isSlacking: false,
+                isOffsiteStudy: false
             )
         }
         let catchUpPlan = CatchUpPlanCalculator.plan(

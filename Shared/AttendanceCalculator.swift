@@ -82,6 +82,11 @@ struct DailyAttendanceSummary: Sendable, Identifiable, Equatable {
     let isComplete: Bool
     let isPartial: Bool
     let isSlacking: Bool
+    let isOffsiteStudy: Bool
+
+    var isExcludedFromAttendance: Bool {
+        isSlacking || isOffsiteStudy
+    }
 
     var id: Date { date }
 }
@@ -106,7 +111,8 @@ enum CatchUpPlanCalculator {
             let summary = summariesInPeriod.first {
                 calendar.isDate($0.date, inSameDayAs: day)
             }
-            return summary?.isSlacking != true && summary?.isComplete != true
+            return summary?.isExcludedFromAttendance != true
+                && summary?.isComplete != true
         }.count
 
         let requiredMinutes: Int

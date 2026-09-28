@@ -42,6 +42,9 @@ struct MenuBarAttendanceView: View {
                     if today.isSlacking {
                         Label("摆烂", systemImage: "moon.zzz.fill")
                             .foregroundStyle(.purple)
+                    } else if today.isOffsiteStudy {
+                        Label("外出自习", systemImage: "book.closed.fill")
+                            .foregroundStyle(.green)
                     } else {
                         Text(
                             "\(DakaFormatters.time(today.effectiveCheckIn)) — "
@@ -66,7 +69,7 @@ struct MenuBarAttendanceView: View {
                 }
                 .disabled(
                     store.todayRecord?.checkIn == nil
-                        || store.todayRecord?.isSlacking == true
+                        || store.todayRecord?.isExcludedFromAttendance == true
                 )
                 Button(store.todayRecord?.isSlacking == true ? "取消摆烂" : "今天摆烂") {
                     if store.todayRecord?.isSlacking == true {

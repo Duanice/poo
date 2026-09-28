@@ -104,14 +104,12 @@ private struct DakaWidgetView: View {
                 }
 
                 HStack {
-                    Text(entry.todayIsSlacking
-                         ? "今日摆烂"
-                         : "今日 \(AttendanceCalculator.compactDuration(entry.todayMinutes))")
+                    Text(todayCompactText)
                     Spacer()
                     Text(catchUpCompactText)
                 }
                 .font(.caption2)
-                .foregroundStyle(entry.todayIsSlacking ? .purple : .secondary)
+                .foregroundStyle(todayStatusColor)
             }
         }
         .foregroundStyle(.white)
@@ -148,11 +146,11 @@ private struct DakaWidgetView: View {
                 Text("今日")
                     .font(.caption)
                     .foregroundStyle(.secondary)
-                Text("\(DakaFormattersWidget.time(entry.todayCheckIn)) — \(DakaFormattersWidget.time(entry.todayCheckOut))")
+                Text(todayTimeText)
                     .font(.subheadline.weight(.semibold).monospacedDigit())
-                Text(AttendanceCalculator.formatDuration(entry.todayMinutes))
+                Text(todayDurationText)
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(todayStatusColor)
 
                 Text(catchUpText)
                     .font(.caption2)
@@ -220,13 +218,9 @@ private struct DakaWidgetView: View {
                     Text(catchUpText)
                         .font(.caption.bold())
                         .foregroundStyle(catchUpColor)
-                    Text(
-                        entry.todayIsSlacking
-                            ? "今日已设为摆烂日"
-                            : "今日 \(DakaFormattersWidget.time(entry.todayCheckIn))—\(DakaFormattersWidget.time(entry.todayCheckOut)) · \(AttendanceCalculator.compactDuration(entry.todayMinutes))"
-                    )
+                    Text(todayDetailText)
                     .font(.caption2)
-                    .foregroundStyle(entry.todayIsSlacking ? .purple : .secondary)
+                    .foregroundStyle(todayStatusColor)
                 }
 
                 Spacer()
@@ -260,6 +254,38 @@ private struct DakaWidgetView: View {
             return "无剩余可打卡日期，还差 \(AttendanceCalculator.compactDuration(entry.catchUpPlan.remainingMinutes))"
         }
         return "剩余 \(entry.catchUpPlan.eligibleDays) 天 · 每天需 \(AttendanceCalculator.compactDuration(entry.catchUpPlan.requiredMinutesPerDay))"
+    }
+
+    private var todayCompactText: String {
+        if entry.todayIsSlacking { return "今日摆烂" }
+        if entry.todayIsOffsiteStudy { return "今日外出自习" }
+        return "今日 \(AttendanceCalculator.compactDuration(entry.todayMinutes))"
+    }
+
+    private var todayTimeText: String {
+        if entry.todayIsSlacking { return "今日摆烂" }
+        if entry.todayIsOffsiteStudy { return "今日外出自习" }
+        return "\(DakaFormattersWidget.time(entry.todayCheckIn)) — \(DakaFormattersWidget.time(entry.todayCheckOut))"
+    }
+
+    private var todayDurationText: String {
+        entry.todayIsSlacking || entry.todayIsOffsiteStudy
+            ? "不计入打卡时长"
+            : AttendanceCalculator.formatDuration(entry.todayMinutes)
+    }
+
+    private var todayDetailText: String {
+        if entry.todayIsSlacking { return "今日已设为摆烂日" }
+        if entry.todayIsOffsiteStudy { return "今日外出自习 · 不计打卡时长" }
+        return "今日 \(DakaFormattersWidget.time(entry.todayCheckIn))—"
+            + "\(DakaFormattersWidget.time(entry.todayCheckOut)) · "
+            + AttendanceCalculator.compactDuration(entry.todayMinutes)
+    }
+
+    private var todayStatusColor: Color {
+        if entry.todayIsSlacking { return .purple }
+        if entry.todayIsOffsiteStudy { return .green }
+        return .secondary
     }
 
     private var catchUpCompactText: String {
@@ -327,6 +353,7 @@ private struct DakaCycleGrid: View {
             HStack(spacing: 11) {
                 DakaGridLegend(color: .blue, text: "已完成")
                 DakaGridLegend(color: .orange, text: "未完整")
+                DakaGridLegend(color: .green, text: "外出自习")
                 DakaGridLegend(color: .purple, text: "摆烂")
                 DakaGridLegend(color: .white.opacity(0.18), text: "未记录")
             }
@@ -342,6 +369,9 @@ private struct DakaCycleDay: View {
     private var fillColor: Color {
         if summary.isSlacking {
             return .purple.opacity(0.75)
+        }
+        if summary.isOffsiteStudy {
+            return .green.opacity(0.75)
         }
         if summary.isComplete {
             return .blue.opacity(0.75)
@@ -362,7 +392,11 @@ private struct DakaCycleDay: View {
                         .font(.system(size: 7, weight: .medium, design: .rounded))
                         .lineLimit(1)
                 } else {
-                    Image(systemName: summary.isSlacking ? "moon.zzz.fill" : "minus")
+                    Image(
+                        systemName: summary.isSlacking
+                            ? "moon.zzz.fill"
+                            : summary.isOffsiteStudy ? "book.closed.fill" : "minus"
+                    )
                         .font(.system(size: 7))
                 }
             }

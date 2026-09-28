@@ -6,6 +6,7 @@ import WidgetKit
 enum FeedbackStyle {
     case success
     case information
+    case offsiteStudy
     case warning
     case failure
 }
@@ -276,6 +277,13 @@ final class AttendanceStore: ObservableObject {
         return item.hasAnyEffectiveTime
     }
 
+    func requiresClearingBeforeOffsiteStudy(on date: Date) -> Bool {
+        guard let item = record(on: date), !item.isOffsiteStudy else {
+            return false
+        }
+        return item.hasAnyEffectiveTime
+    }
+
     @discardableResult
     func setSlacking(
         on date: Date,
@@ -296,21 +304,49 @@ final class AttendanceStore: ObservableObject {
                 clearExistingRecord: clearExistingRecord
             )
             didMutate()
-            let plan = currentCatchUpPlan
-            let detail: String
-            if plan.isCompleted {
-                detail = "本周期目标已完成"
-            } else if plan.isImpossible {
-                detail = "本周期已无剩余可打卡日期"
-            } else {
-                detail = "剩余 \(plan.eligibleDays) 天，每天需要 \(AttendanceCalculator.formatDuration(plan.requiredMinutesPerDay))"
-            }
             presentFeedback(
                 title: enabled
                     ? "\(DakaFormatters.shortDay(date)) 已设为摆烂日"
                     : "已取消 \(DakaFormatters.shortDay(date)) 摆烂状态",
-                detail: detail,
+                detail: catchUpPlanFeedbackDetail,
                 style: enabled ? .information : .success,
+                actionTitle: "撤销",
+                duration: 6
+            )
+            return true
+        } catch {
+            pendingUndo = nil
+            errorMessage = error.localizedDescription
+            return false
+        }
+    }
+
+    @discardableResult
+    func setOffsiteStudy(
+        on date: Date,
+        enabled: Bool,
+        clearExistingRecord: Bool = false
+    ) -> Bool {
+        do {
+            pendingUndo = UndoRecordSnapshot(
+                date: date,
+                record: record(on: date).map(BackupRecord.init)
+            )
+            try AttendanceMutationService(
+                context: modelContext,
+                calendar: calendar
+            ).setOffsiteStudy(
+                on: date,
+                enabled: enabled,
+                clearExistingRecord: clearExistingRecord
+            )
+            didMutate()
+            presentFeedback(
+                title: enabled
+                    ? "\(DakaFormatters.shortDay(date)) 已设为外出自习"
+                    : "已取消 \(DakaFormatters.shortDay(date)) 外出自习状态",
+                detail: catchUpPlanFeedbackDetail,
+                style: enabled ? .offsiteStudy : .success,
                 actionTitle: "撤销",
                 duration: 6
             )
@@ -338,6 +374,7 @@ final class AttendanceStore: ObservableObject {
                         checkOut: snapshot.checkOut,
                         note: snapshot.note,
                         isSlacking: snapshot.isSlacking ?? false,
+                        isOffsiteStudy: snapshot.isOffsiteStudy ?? false,
                         createdAt: snapshot.createdAt,
                         updatedAt: snapshot.updatedAt,
                         actualCheckIn: snapshot.actualCheckIn,
@@ -419,6 +456,7 @@ final class AttendanceStore: ObservableObject {
                         checkOut: item.checkOut,
                         note: item.note,
                         isSlacking: item.isSlacking ?? false,
+                        isOffsiteStudy: item.isOffsiteStudy ?? false,
                         createdAt: item.createdAt,
                         updatedAt: item.updatedAt,
                         actualCheckIn: item.actualCheckIn,
@@ -550,6 +588,7 @@ final class AttendanceStore: ObservableObject {
                     checkIn: containsActualData ? nil : item.checkIn,
                     checkOut: containsActualData ? nil : item.checkOut,
                     isSlacking: item.isSlacking,
+                    isOffsiteStudy: item.isOffsiteStudy ?? false,
                     actualCheckIn: containsActualData ? item.checkIn : nil,
                     actualCheckOut: containsActualData ? item.checkOut : nil,
                     actualDurationMinutes: containsActualData
@@ -577,6 +616,18 @@ final class AttendanceStore: ObservableObject {
             return
         }
         setSlacking(on: .now, enabled: true)
+    }
+
+    private var catchUpPlanFeedbackDetail: String {
+        let plan = currentCatchUpPlan
+        if plan.isCompleted {
+            return "本周期目标已完成"
+        }
+        if plan.isImpossible {
+            return "本周期已无剩余可打卡日期"
+        }
+        return "剩余 \(plan.eligibleDays) 天，每天需要 "
+            + AttendanceCalculator.formatDuration(plan.requiredMinutesPerDay)
     }
 
     private func presentFeedback(

@@ -94,6 +94,45 @@ final class AttendanceMutationServiceTests: XCTestCase {
         XCTAssertEqual(record.durationMinutes, 0)
     }
 
+    func testOffsiteStudyIsExclusiveAndDoesNotCountAttendance() throws {
+        let container = try AppDataContainer.make(inMemory: true)
+        let context = ModelContext(container)
+        let service = AttendanceMutationService(context: context)
+        let workDate = Date.now
+
+        try service.setSlacking(on: workDate, enabled: true)
+        try service.setOffsiteStudy(on: workDate, enabled: true)
+
+        var record = try XCTUnwrap(service.record(on: workDate))
+        XCTAssertTrue(record.isOffsiteStudy)
+        XCTAssertFalse(record.isSlacking)
+        XCTAssertEqual(record.durationMinutes, 0)
+
+        try service.setOffsiteStudy(on: workDate, enabled: false)
+        XCTAssertNil(try service.record(on: workDate))
+
+        let checkIn = AttendanceCalculator.date(on: workDate, minuteOfDay: 600)
+        let checkOut = AttendanceCalculator.date(on: workDate, minuteOfDay: 1_320)
+        try service.save(
+            workDate: workDate,
+            checkIn: checkIn,
+            checkOut: checkOut,
+            note: ""
+        )
+        XCTAssertThrowsError(
+            try service.setOffsiteStudy(on: workDate, enabled: true)
+        )
+        try service.setOffsiteStudy(
+            on: workDate,
+            enabled: true,
+            clearExistingRecord: true
+        )
+        record = try XCTUnwrap(service.record(on: workDate))
+        XCTAssertTrue(record.isOffsiteStudy)
+        XCTAssertNil(record.checkIn)
+        XCTAssertNil(record.checkOut)
+    }
+
     func testVersionOneBackupWithoutSlackingFieldStillDecodes() throws {
         let data = Data(
             """
@@ -121,18 +160,20 @@ final class AttendanceMutationServiceTests: XCTestCase {
         XCTAssertEqual(backup.formatVersion, 1)
         XCTAssertEqual(backup.records.count, 1)
         XCTAssertNil(backup.records[0].isSlacking)
+        XCTAssertNil(backup.records[0].isOffsiteStudy)
     }
 
-    func testVersionFourBackupPreservesSlackingState() throws {
+    func testVersionFiveBackupPreservesDayStates() throws {
         let record = AttendanceRecord(
             workDate: .now,
-            isSlacking: true
+            isOffsiteStudy: true
         )
 
         let data = try BackupService.jsonData(records: [record])
         let backup = try BackupService.decode(data)
 
-        XCTAssertEqual(backup.formatVersion, 4)
-        XCTAssertEqual(backup.records.first?.isSlacking, true)
+        XCTAssertEqual(backup.formatVersion, 5)
+        XCTAssertEqual(backup.records.first?.isSlacking, false)
+        XCTAssertEqual(backup.records.first?.isOffsiteStudy, true)
     }
 }

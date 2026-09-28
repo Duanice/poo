@@ -6,11 +6,12 @@ struct WidgetSnapshotRecord: Codable, Sendable, Equatable {
     let checkIn: Date?
     let checkOut: Date?
     let isSlacking: Bool
+    let isOffsiteStudy: Bool?
     let durationMinutesOverride: Int?
     let isActualData: Bool?
 
     var durationMinutes: Int {
-        guard !isSlacking else { return 0 }
+        guard !isExcludedFromAttendance else { return 0 }
         if let durationMinutesOverride {
             return max(0, durationMinutesOverride)
         }
@@ -21,10 +22,14 @@ struct WidgetSnapshotRecord: Codable, Sendable, Equatable {
     }
 
     var isComplete: Bool {
-        !isSlacking
+        !isExcludedFromAttendance
             && checkIn != nil
             && checkOut != nil
             && durationMinutes > 0
+    }
+
+    var isExcludedFromAttendance: Bool {
+        isSlacking || isOffsiteStudy == true
     }
 }
 
@@ -74,6 +79,7 @@ enum WidgetSnapshotStore {
                     checkIn: $0.effectiveCheckIn,
                     checkOut: $0.effectiveCheckOut,
                     isSlacking: $0.isSlacking,
+                    isOffsiteStudy: $0.isOffsiteStudy,
                     durationMinutesOverride: $0.hasActualData
                         ? $0.durationMinutes
                         : nil,

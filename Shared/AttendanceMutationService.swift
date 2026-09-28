@@ -5,6 +5,7 @@ enum AttendanceMutationError: LocalizedError {
     case invalidTimeRange
     case missingCheckIn
     case existingRecordRequiresConfirmation
+    case existingRecordRequiresOffsiteStudyConfirmation
 
     var errorDescription: String? {
         switch self {
@@ -14,6 +15,8 @@ enum AttendanceMutationError: LocalizedError {
             return "请先设置上班时间。"
         case .existingRecordRequiresConfirmation:
             return "该日期已有打卡时间。请确认清空记录后再设为摆烂日。"
+        case .existingRecordRequiresOffsiteStudyConfirmation:
+            return "该日期已有打卡时间。请确认清空记录后再设为外出自习。"
         }
     }
 }
@@ -59,6 +62,7 @@ struct AttendanceMutationService {
         item.checkOut = checkOut
         item.note = note.trimmingCharacters(in: .whitespacesAndNewlines)
         item.isSlackingFlag = false
+        item.isOffsiteStudyFlag = false
         item.updatedAt = .now
         try context.save()
         return item
@@ -71,6 +75,7 @@ struct AttendanceMutationService {
             context.insert(item)
         }
         item.isSlackingFlag = false
+        item.isOffsiteStudyFlag = false
         item.checkIn = date
         if let checkOut = item.checkOut, checkOut <= date {
             item.checkOut = nil
@@ -98,15 +103,10 @@ struct AttendanceMutationService {
                 context.insert(item)
             }
             if clearExistingRecord {
-                item.checkIn = nil
-                item.checkOut = nil
-                item.actualCheckIn = nil
-                item.actualCheckOut = nil
-                item.actualDurationMinutes = nil
-                item.actualImportedAt = nil
-                item.actualImportBatchID = nil
+                clearAttendanceData(on: item)
             }
             item.isSlackingFlag = true
+            item.isOffsiteStudyFlag = false
             item.updatedAt = .now
         } else if let existing {
             existing.isSlackingFlag = false
@@ -114,6 +114,46 @@ struct AttendanceMutationService {
             if existing.checkIn == nil,
                existing.checkOut == nil,
                !existing.hasActualData,
+               !existing.isOffsiteStudy,
+               existing.note.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                context.delete(existing)
+            }
+        }
+
+        try context.save()
+    }
+
+    func setOffsiteStudy(
+        on date: Date,
+        enabled: Bool,
+        clearExistingRecord: Bool = false
+    ) throws {
+        let existing = try record(on: date)
+
+        if enabled {
+            if let existing,
+               existing.hasAnyEffectiveTime,
+               !clearExistingRecord {
+                throw AttendanceMutationError.existingRecordRequiresOffsiteStudyConfirmation
+            }
+
+            let item = existing ?? AttendanceRecord(workDate: date)
+            if existing == nil {
+                context.insert(item)
+            }
+            if clearExistingRecord {
+                clearAttendanceData(on: item)
+            }
+            item.isOffsiteStudyFlag = true
+            item.isSlackingFlag = false
+            item.updatedAt = .now
+        } else if let existing {
+            existing.isOffsiteStudyFlag = false
+            existing.updatedAt = .now
+            if existing.checkIn == nil,
+               existing.checkOut == nil,
+               !existing.hasActualData,
+               !existing.isSlacking,
                existing.note.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                 context.delete(existing)
             }
@@ -133,6 +173,7 @@ struct AttendanceMutationService {
         if item.checkIn == nil,
            item.checkOut == nil,
            !item.isSlacking,
+           !item.isOffsiteStudy,
            item.note.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             context.delete(item)
         }
@@ -156,5 +197,15 @@ struct AttendanceMutationService {
             context.delete(item)
             try context.save()
         }
+    }
+
+    private func clearAttendanceData(on item: AttendanceRecord) {
+        item.checkIn = nil
+        item.checkOut = nil
+        item.actualCheckIn = nil
+        item.actualCheckOut = nil
+        item.actualDurationMinutes = nil
+        item.actualImportedAt = nil
+        item.actualImportBatchID = nil
     }
 }

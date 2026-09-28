@@ -33,6 +33,9 @@ extension AttendanceRecord {
         if isSlacking {
             return "摆烂"
         }
+        if isOffsiteStudy {
+            return "外出自习"
+        }
         if hasActualData {
             return "实验室实际"
         }
@@ -50,6 +53,7 @@ extension AttendanceRecord {
 
     var statusColor: Color {
         if isSlacking { return .purple }
+        if isOffsiteStudy { return .green }
         if hasActualData { return .cyan }
         if isComplete { return .green }
         if hasAnyEffectiveTime { return .orange }
@@ -65,6 +69,7 @@ struct FeedbackBanner: View {
         switch feedback.style {
         case .success: .green
         case .information: .purple
+        case .offsiteStudy: .green
         case .warning: .orange
         case .failure: .red
         }
@@ -74,6 +79,7 @@ struct FeedbackBanner: View {
         switch feedback.style {
         case .success: "checkmark.circle.fill"
         case .information: "moon.zzz.fill"
+        case .offsiteStudy: "book.closed.fill"
         case .warning: "exclamationmark.triangle.fill"
         case .failure: "xmark.octagon.fill"
         }

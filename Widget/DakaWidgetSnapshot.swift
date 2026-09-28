@@ -10,6 +10,7 @@ struct DakaWidgetEntry: TimelineEntry {
     let todayCheckIn: Date?
     let todayCheckOut: Date?
     let todayIsSlacking: Bool
+    let todayIsOffsiteStudy: Bool
     let catchUpPlan: CatchUpPlan
     let dailySummaries: [DailyAttendanceSummary]
     let loadError: Bool
@@ -22,7 +23,8 @@ struct DakaWidgetEntry: TimelineEntry {
                 durationMinutes: index < 10 ? (6 + index % 5) * 60 : 0,
                 isComplete: index < 10,
                 isPartial: index == 10,
-                isSlacking: index == 11 || index == 14
+                isSlacking: index == 11 || index == 14,
+                isOffsiteStudy: index == 12
             )
         }
         return DakaWidgetEntry(
@@ -34,6 +36,7 @@ struct DakaWidgetEntry: TimelineEntry {
             todayCheckIn: AttendanceCalculator.date(on: .now, minuteOfDay: 10 * 60),
             todayCheckOut: AttendanceCalculator.date(on: .now, minuteOfDay: 18 * 60),
             todayIsSlacking: false,
+            todayIsOffsiteStudy: false,
             catchUpPlan: CatchUpPlan(
                 completedMinutes: 92 * 60 + 30,
                 remainingMinutes: 67 * 60 + 30,
@@ -66,10 +69,11 @@ enum DakaWidgetSnapshotLoader {
                     durationMinutes: record?.durationMinutes ?? 0,
                     isComplete: record?.isComplete ?? false,
                     isPartial: record != nil
-                        && record?.isSlacking != true
+                        && record?.isExcludedFromAttendance != true
                         && record?.isComplete != true
                         && (record?.checkIn != nil || record?.checkOut != nil),
-                    isSlacking: record?.isSlacking ?? false
+                    isSlacking: record?.isSlacking ?? false,
+                    isOffsiteStudy: record?.isOffsiteStudy == true
                 )
             }
             let today = records.first {
@@ -91,6 +95,7 @@ enum DakaWidgetSnapshotLoader {
                 todayCheckIn: today?.checkIn,
                 todayCheckOut: today?.checkOut,
                 todayIsSlacking: today?.isSlacking ?? false,
+                todayIsOffsiteStudy: today?.isOffsiteStudy == true,
                 catchUpPlan: plan,
                 dailySummaries: summaries,
                 loadError: false
@@ -105,6 +110,7 @@ enum DakaWidgetSnapshotLoader {
                 todayCheckIn: nil,
                 todayCheckOut: nil,
                 todayIsSlacking: false,
+                todayIsOffsiteStudy: false,
                 catchUpPlan: CatchUpPlan(
                     completedMinutes: 0,
                     remainingMinutes: AppConstants.defaultTargetMinutes,

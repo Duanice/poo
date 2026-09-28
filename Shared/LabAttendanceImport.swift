@@ -379,6 +379,7 @@ struct LabAttendanceImportService {
             record.actualImportedAt = importedAt
             record.actualImportBatchID = batchID
             record.isSlackingFlag = false
+            record.isOffsiteStudyFlag = false
             record.updatedAt = importedAt
         }
 

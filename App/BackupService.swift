@@ -10,6 +10,7 @@ struct BackupRecord: Codable, Sendable {
     let checkOut: Date?
     let note: String
     let isSlacking: Bool?
+    let isOffsiteStudy: Bool?
     let createdAt: Date
     let updatedAt: Date
     let actualCheckIn: Date?
@@ -25,6 +26,7 @@ struct BackupRecord: Codable, Sendable {
         checkOut = record.checkOut
         note = record.note
         isSlacking = record.isSlacking
+        isOffsiteStudy = record.isOffsiteStudy
         createdAt = record.createdAt
         updatedAt = record.updatedAt
         actualCheckIn = record.actualCheckIn
@@ -62,7 +64,7 @@ struct BackupEnvelope: Codable, Sendable {
         records: [AttendanceRecord],
         bowelMovements: [BowelMovementRecord] = []
     ) {
-        formatVersion = 4
+        formatVersion = 5
         exportedAt = .now
         appName = "中关村实验室打卡 for 段冰洁"
         self.records = records.map(BackupRecord.init)
@@ -90,7 +92,7 @@ enum BackupService {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
         let envelope = try decoder.decode(BackupEnvelope.self, from: data)
-        guard (1...4).contains(envelope.formatVersion) else {
+        guard (1...5).contains(envelope.formatVersion) else {
             throw BackupError.unsupportedVersion(envelope.formatVersion)
         }
         return envelope
