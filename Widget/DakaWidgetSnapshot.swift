@@ -53,7 +53,7 @@ struct DakaWidgetEntry: TimelineEntry {
 enum DakaWidgetSnapshotLoader {
     static func load(at now: Date = .now) -> DakaWidgetEntry {
         let period = AttendancePeriodCalculator.period(containing: now)
-        let calendar = Calendar.autoupdatingCurrent
+        let calendar = DakaCalendar.china
 
         do {
             let snapshot = try WidgetSnapshotStore.load()
@@ -142,11 +142,7 @@ struct DakaTimelineProvider: TimelineProvider {
         completion: @escaping (Timeline<DakaWidgetEntry>) -> Void
     ) {
         let entry = DakaWidgetSnapshotLoader.load()
-        let nextUpdate = Calendar.current.date(
-            byAdding: .minute,
-            value: 15,
-            to: .now
-        ) ?? Date.now.addingTimeInterval(15 * 60)
+        let nextUpdate = Date.now.addingTimeInterval(15 * 60)
         completion(Timeline(entries: [entry], policy: .after(nextUpdate)))
     }
 }

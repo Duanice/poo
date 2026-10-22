@@ -12,7 +12,7 @@ struct AttendancePeriod: Hashable, Sendable {
         date >= start && date < endExclusive
     }
 
-    func allDays(calendar: Calendar = .autoupdatingCurrent) -> [Date] {
+    func allDays(calendar: Calendar = DakaCalendar.china) -> [Date] {
         var result: [Date] = []
         var cursor = start
         while cursor < endExclusive {
@@ -29,7 +29,7 @@ struct AttendancePeriod: Hashable, Sendable {
 enum AttendancePeriodCalculator {
     static func period(
         containing date: Date,
-        calendar inputCalendar: Calendar = .autoupdatingCurrent
+        calendar inputCalendar: Calendar = DakaCalendar.china
     ) -> AttendancePeriod {
         var calendar = inputCalendar
         calendar.timeZone = inputCalendar.timeZone
@@ -68,7 +68,7 @@ enum AttendancePeriodCalculator {
     static func shifted(
         _ period: AttendancePeriod,
         byMonths offset: Int,
-        calendar: Calendar = .autoupdatingCurrent
+        calendar: Calendar = DakaCalendar.china
     ) -> AttendancePeriod {
         let anchor = calendar.date(byAdding: .month, value: offset, to: period.start)!
         return self.period(containing: anchor, calendar: calendar)

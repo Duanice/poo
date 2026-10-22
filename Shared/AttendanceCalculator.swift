@@ -12,7 +12,7 @@ enum AttendanceCalculator {
         on workDate: Date,
         minuteOfDay: Int,
         dayOffset: Int = 0,
-        calendar: Calendar = .autoupdatingCurrent
+        calendar: Calendar = DakaCalendar.china
     ) -> Date {
         let normalizedMinute = min(max(minuteOfDay, 0), 23 * 60 + 59)
         let base = calendar.date(byAdding: .day, value: dayOffset, to: calendar.startOfDay(for: workDate))!
@@ -26,7 +26,7 @@ enum AttendanceCalculator {
 
     static func minuteOfDay(
         from date: Date,
-        calendar: Calendar = .autoupdatingCurrent
+        calendar: Calendar = DakaCalendar.china
     ) -> Int {
         calendar.component(.hour, from: date) * 60 + calendar.component(.minute, from: date)
     }
@@ -97,7 +97,7 @@ enum CatchUpPlanCalculator {
         summaries: [DailyAttendanceSummary],
         targetMinutes: Int,
         now: Date = .now,
-        calendar: Calendar = .autoupdatingCurrent
+        calendar: Calendar = DakaCalendar.china
     ) -> CatchUpPlan {
         let today = calendar.startOfDay(for: now)
         let summariesInPeriod = summaries.filter { period.contains($0.date) }

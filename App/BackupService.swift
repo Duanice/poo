@@ -106,7 +106,7 @@ enum BackupService {
         let ordered = records.sorted { $0.workDate < $1.workDate }
         for record in ordered {
             let columns = [
-                record.workDate.formatted(.iso8601.year().month().day()),
+                DakaFormatters.deepLinkDate(record.workDate),
                 record.hasActualData ? "实验室实际数据" : "手动记录",
                 DakaFormatters.time(record.actualCheckIn),
                 DakaFormatters.time(record.actualCheckOut),
@@ -128,7 +128,7 @@ enum BackupService {
         var lines = ["日期,时间,描述,创建时间,最后修改时间"]
         for record in records.sorted(by: { $0.occurredAt < $1.occurredAt }) {
             let columns = [
-                record.occurredAt.formatted(.iso8601.year().month().day()),
+                DakaFormatters.deepLinkDate(record.occurredAt),
                 DakaFormatters.time(record.occurredAt),
                 record.note,
                 record.createdAt.formatted(.iso8601),

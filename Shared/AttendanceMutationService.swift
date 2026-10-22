@@ -26,7 +26,7 @@ struct AttendanceMutationService {
     let context: ModelContext
     let calendar: Calendar
 
-    init(context: ModelContext, calendar: Calendar = .autoupdatingCurrent) {
+    init(context: ModelContext, calendar: Calendar = DakaCalendar.china) {
         self.context = context
         self.calendar = calendar
     }

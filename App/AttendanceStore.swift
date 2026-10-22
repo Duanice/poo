@@ -44,7 +44,7 @@ final class AttendanceStore: ObservableObject {
     private var pendingUndo: UndoRecordSnapshot?
     private var feedbackTask: Task<Void, Never>?
 
-    init(modelContainer: ModelContainer, calendar: Calendar = .autoupdatingCurrent) {
+    init(modelContainer: ModelContainer, calendar: Calendar = DakaCalendar.china) {
         self.modelContext = ModelContext(modelContainer)
         self.modelContext.autosaveEnabled = true
         self.calendar = calendar

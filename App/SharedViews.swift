@@ -165,27 +165,59 @@ struct RecordEditorSheet: View {
 }
 
 enum DakaFormatters {
+    private static var chinaStyle: Date.FormatStyle {
+        Date.FormatStyle(
+            date: .omitted,
+            time: .omitted,
+            locale: DakaCalendar.locale,
+            calendar: DakaCalendar.china,
+            timeZone: DakaCalendar.timeZone
+        )
+    }
+
     static func day(_ date: Date) -> String {
-        date.formatted(.dateTime.month(.wide).day().weekday(.abbreviated).locale(Locale(identifier: "zh_CN")))
+        date.formatted(chinaStyle.month(.wide).day().weekday(.abbreviated))
     }
 
     static func shortDay(_ date: Date) -> String {
-        date.formatted(.dateTime.month(.twoDigits).day(.twoDigits).locale(Locale(identifier: "zh_CN")))
+        date.formatted(chinaStyle.month(.twoDigits).day(.twoDigits))
     }
 
     static func time(_ date: Date?) -> String {
         guard let date else { return "—" }
-        return date.formatted(.dateTime.hour(.twoDigits(amPM: .omitted)).minute(.twoDigits).locale(Locale(identifier: "zh_CN")))
+        return date.formatted(
+            chinaStyle.hour(.twoDigits(amPM: .omitted)).minute(.twoDigits)
+        )
     }
 
     static func period(_ period: AttendancePeriod) -> String {
-        let start = period.start.formatted(.dateTime.year().month(.twoDigits).day(.twoDigits))
-        let end = period.endInclusive.formatted(.dateTime.year().month(.twoDigits).day(.twoDigits))
+        let style = chinaStyle.year().month(.twoDigits).day(.twoDigits)
+        let start = period.start.formatted(style)
+        let end = period.endInclusive.formatted(style)
         return "\(start) — \(end)"
     }
 
+    static func monthDay(_ date: Date) -> String {
+        date.formatted(chinaStyle.month().day())
+    }
+
+    static func weekday(_ date: Date) -> String {
+        date.formatted(chinaStyle.weekday(.wide))
+    }
+
+    static func monthAbbreviatedDay(_ date: Date) -> String {
+        date.formatted(chinaStyle.month(.abbreviated).day())
+    }
+
+    static func dayNumber(_ date: Date) -> String {
+        String(DakaCalendar.china.component(.day, from: date))
+    }
+
     static func exportTimestamp(_ date: Date = .now) -> String {
-        let components = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: date)
+        let components = DakaCalendar.china.dateComponents(
+            [.year, .month, .day, .hour, .minute],
+            from: date
+        )
         return String(
             format: "%04d%02d%02d-%02d%02d",
             components.year ?? 0,
@@ -197,7 +229,10 @@ enum DakaFormatters {
     }
 
     static func deepLinkDate(_ date: Date) -> String {
-        let components = Calendar.current.dateComponents([.year, .month, .day], from: date)
+        let components = DakaCalendar.china.dateComponents(
+            [.year, .month, .day],
+            from: date
+        )
         return String(
             format: "%04d-%02d-%02d",
             components.year ?? 0,

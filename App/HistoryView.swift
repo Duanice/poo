@@ -32,7 +32,7 @@ struct HistoryView: View {
                 }
                 Spacer()
                 Button {
-                    selectedAnchor = Calendar.current.date(
+                    selectedAnchor = DakaCalendar.china.date(
                         byAdding: .month,
                         value: -1,
                         to: period.start
@@ -44,7 +44,7 @@ struct HistoryView: View {
                     selectedAnchor = .now
                 }
                 Button {
-                    selectedAnchor = Calendar.current.date(
+                    selectedAnchor = DakaCalendar.china.date(
                         byAdding: .month,
                         value: 1,
                         to: period.start
@@ -145,7 +145,7 @@ struct CycleCalendarView: View {
     private var gridDays: [Date?] {
         let days = period.allDays()
         guard let first = days.first else { return [] }
-        let weekday = Calendar.current.component(.weekday, from: first)
+        let weekday = DakaCalendar.china.component(.weekday, from: first)
         let leadingEmpty = (weekday + 5) % 7
         var result = Array<Date?>(repeating: nil, count: leadingEmpty)
         result.append(contentsOf: days.map(Optional.some))
@@ -360,7 +360,7 @@ private struct CalendarDayCell: View {
                 .frame(maxWidth: .infinity, minHeight: compact ? 62 : 82, alignment: .leading)
                 .background(backgroundColor, in: RoundedRectangle(cornerRadius: 11))
                 .overlay {
-                    if Calendar.current.isDateInToday(day) {
+                    if DakaCalendar.china.isDateInToday(day) {
                         RoundedRectangle(cornerRadius: 11)
                             .strokeBorder(.cyan, lineWidth: 2)
                     }
@@ -381,15 +381,10 @@ private struct CalendarDayCell: View {
     }
 
     private var dayLabel: String {
-        if Calendar.current.component(.day, from: day) == 1 {
-            return day.formatted(
-                .dateTime
-                    .month(.abbreviated)
-                    .day()
-                    .locale(Locale(identifier: "zh_CN"))
-            )
+        if DakaCalendar.china.component(.day, from: day) == 1 {
+            return DakaFormatters.monthAbbreviatedDay(day)
         }
-        return day.formatted(.dateTime.day())
+        return DakaFormatters.dayNumber(day)
     }
 
     private var bowelBadge: String {
@@ -435,9 +430,9 @@ private struct DayRecordRow: View {
     var body: some View {
         HStack(spacing: 16) {
             VStack(alignment: .leading, spacing: 2) {
-                Text(day.formatted(.dateTime.month().day()))
+                Text(DakaFormatters.monthDay(day))
                     .font(.body.weight(.semibold))
-                Text(day.formatted(.dateTime.weekday(.wide).locale(Locale(identifier: "zh_CN"))))
+                Text(DakaFormatters.weekday(day))
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }

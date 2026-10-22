@@ -186,7 +186,7 @@ struct BowelMovementEditorRequest: Identifiable {
     let note: String
 
     static func new(on date: Date) -> BowelMovementEditorRequest {
-        let calendar = Calendar.autoupdatingCurrent
+        let calendar = DakaCalendar.china
         let occurredAt = calendar.isDateInToday(date)
             ? Date.now
             : calendar.date(bySettingHour: 12, minute: 0, second: 0, of: date) ?? date
@@ -293,8 +293,8 @@ struct BowelMovementDayEditorCard: View {
     }
 
     private var isFuture: Bool {
-        Calendar.current.startOfDay(for: date)
-            > Calendar.current.startOfDay(for: .now)
+        DakaCalendar.china.startOfDay(for: date)
+            > DakaCalendar.china.startOfDay(for: .now)
     }
 
     var body: some View {
@@ -345,7 +345,7 @@ struct BowelMovementDayEditorCard: View {
 
     private var emptyStatus: String {
         if isFuture { return "未来日期不能记录" }
-        if Calendar.current.isDateInToday(date) { return "今天还没记录" }
+        if DakaCalendar.china.isDateInToday(date) { return "今天还没记录" }
         return "没拉"
     }
 }

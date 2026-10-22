@@ -81,6 +81,18 @@ final class LabAttendanceImportParserTests: XCTestCase {
         )
     }
 
+    func testDefaultParserKeepsChinaWallClockTime() throws {
+        let row = try XCTUnwrap(
+            LabAttendanceImportParser.parse("2026-10-19 10:50 21:55 11.1").rows.first
+        )
+        XCTAssertEqual(timeComponents(row.checkIn), [10, 50])
+        XCTAssertEqual(timeComponents(row.checkOut), [21, 55])
+        XCTAssertEqual(
+            calendar.dateComponents([.year, .month, .day], from: row.workDate).day,
+            19
+        )
+    }
+
     private func timeComponents(_ date: Date) -> [Int] {
         let components = calendar.dateComponents([.hour, .minute], from: date)
         return [components.hour!, components.minute!]

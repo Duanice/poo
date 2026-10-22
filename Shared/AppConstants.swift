@@ -1,5 +1,17 @@
 import Foundation
 
+enum DakaCalendar {
+    static let timeZone = TimeZone(identifier: "Asia/Shanghai")!
+    static let locale = Locale(identifier: "zh_CN")
+
+    static var china: Calendar {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.locale = locale
+        calendar.timeZone = timeZone
+        return calendar
+    }
+}
+
 enum AppConstants {
     static let widgetKind = "DakaAttendanceWidget"
     static let defaultTargetMinutes = 160 * 60

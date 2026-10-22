@@ -367,13 +367,7 @@ struct LabAttendanceImportView: View {
     }
 
     private func dateText(_ date: Date) -> String {
-        date.formatted(
-            .dateTime
-                .year()
-                .month(.twoDigits)
-                .day(.twoDigits)
-                .locale(Locale(identifier: "zh_CN"))
-        )
+        DakaFormatters.deepLinkDate(date)
     }
 
     private func dispositionColor(

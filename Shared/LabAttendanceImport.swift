@@ -45,7 +45,7 @@ enum LabAttendanceImportError: LocalizedError, Equatable {
 enum LabAttendanceImportParser {
     static func parse(
         _ input: String,
-        calendar sourceCalendar: Calendar = .autoupdatingCurrent
+        calendar sourceCalendar: Calendar = DakaCalendar.china
     ) throws -> LabAttendanceImportDocument {
         let normalizedInput = input
             .replacingOccurrences(of: "：", with: ":")
@@ -249,7 +249,7 @@ enum LabAttendanceImportParser {
     }
 
     private static func dateKey(_ date: Date) -> String {
-        let components = Calendar.autoupdatingCurrent.dateComponents(
+        let components = DakaCalendar.china.dateComponents(
             [.year, .month, .day],
             from: date
         )
@@ -308,7 +308,7 @@ struct LabAttendanceImportService {
 
     init(
         context: ModelContext,
-        calendar: Calendar = .autoupdatingCurrent
+        calendar: Calendar = DakaCalendar.china
     ) {
         self.context = context
         self.calendar = calendar

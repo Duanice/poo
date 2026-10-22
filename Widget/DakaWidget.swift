@@ -7,6 +7,8 @@ struct DakaAttendanceWidget: Widget {
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: DakaTimelineProvider()) { entry in
             DakaWidgetView(entry: entry)
+                .environment(\.calendar, DakaCalendar.china)
+                .environment(\.timeZone, DakaCalendar.timeZone)
                 .containerBackground(for: .widget) {
                     LinearGradient(
                         colors: [
@@ -325,7 +327,7 @@ private struct DakaCycleGrid: View {
         guard let firstDate = summaries.first?.date else {
             return []
         }
-        let weekday = Calendar.autoupdatingCurrent.component(.weekday, from: firstDate)
+        let weekday = DakaCalendar.china.component(.weekday, from: firstDate)
         let leadingEmptyDays = (weekday + 5) % 7
         return Array(repeating: nil, count: leadingEmptyDays) + summaries.map(Optional.some)
     }
@@ -385,7 +387,7 @@ private struct DakaCycleDay: View {
     var body: some View {
         Link(destination: DakaFormattersWidget.recordURL(summary.date)) {
             VStack(spacing: 1) {
-                Text(summary.date.formatted(.dateTime.day()))
+                Text(DakaFormattersWidget.dayNumber(summary.date))
                     .font(.caption2.bold().monospacedDigit())
                 if summary.durationMinutes > 0 {
                     Text(AttendanceCalculator.compactDuration(summary.durationMinutes))
@@ -404,7 +406,7 @@ private struct DakaCycleDay: View {
             .frame(maxWidth: .infinity, minHeight: 29)
             .background(fillColor, in: RoundedRectangle(cornerRadius: 6))
             .overlay {
-                if Calendar.autoupdatingCurrent.isDate(summary.date, inSameDayAs: today) {
+                if DakaCalendar.china.isDate(summary.date, inSameDayAs: today) {
                     RoundedRectangle(cornerRadius: 6)
                         .stroke(.cyan, lineWidth: 1.5)
                 }
@@ -430,17 +432,33 @@ private struct DakaGridLegend: View {
 }
 
 private enum DakaFormattersWidget {
+    private static var chinaStyle: Date.FormatStyle {
+        Date.FormatStyle(
+            date: .omitted,
+            time: .omitted,
+            locale: DakaCalendar.locale,
+            calendar: DakaCalendar.china,
+            timeZone: DakaCalendar.timeZone
+        )
+    }
+
     static func shortDate(_ date: Date) -> String {
-        date.formatted(.dateTime.month(.twoDigits).day(.twoDigits))
+        date.formatted(chinaStyle.month(.twoDigits).day(.twoDigits))
     }
 
     static func time(_ date: Date?) -> String {
         guard let date else { return "—" }
-        return date.formatted(.dateTime.hour(.twoDigits(amPM: .omitted)).minute(.twoDigits))
+        return date.formatted(
+            chinaStyle.hour(.twoDigits(amPM: .omitted)).minute(.twoDigits)
+        )
+    }
+
+    static func dayNumber(_ date: Date) -> String {
+        String(DakaCalendar.china.component(.day, from: date))
     }
 
     static func recordURL(_ date: Date) -> URL {
-        let components = Calendar.autoupdatingCurrent.dateComponents(
+        let components = DakaCalendar.china.dateComponents(
             [.year, .month, .day],
             from: date
         )

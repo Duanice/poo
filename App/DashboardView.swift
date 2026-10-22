@@ -197,11 +197,12 @@ struct ProgressSummaryCard: View {
     }
 
     private var remainingDays: Int {
-        let today = Calendar.current.startOfDay(for: .now)
+        let calendar = DakaCalendar.china
+        let today = calendar.startOfDay(for: .now)
         guard today < period.endExclusive else { return 0 }
         return max(
             0,
-            Calendar.current.dateComponents([.day], from: today, to: period.endExclusive).day ?? 0
+            calendar.dateComponents([.day], from: today, to: period.endExclusive).day ?? 0
         )
     }
 

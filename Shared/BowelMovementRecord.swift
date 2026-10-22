@@ -105,7 +105,7 @@ enum BowelDayStatusResolver {
         on date: Date,
         records: [BowelMovementRecord],
         now: Date = .now,
-        calendar: Calendar = .autoupdatingCurrent
+        calendar: Calendar = DakaCalendar.china
     ) -> BowelDayStatus {
         let day = calendar.startOfDay(for: date)
         let today = calendar.startOfDay(for: now)

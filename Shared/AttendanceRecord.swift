@@ -35,7 +35,7 @@ final class AttendanceRecord {
         actualImportBatchID: UUID? = nil
     ) {
         self.id = id
-        self.workDate = Calendar.autoupdatingCurrent.startOfDay(for: workDate)
+        self.workDate = DakaCalendar.china.startOfDay(for: workDate)
         self.checkIn = checkIn
         self.checkOut = checkOut
         self.note = note
@@ -103,7 +103,7 @@ enum AttendanceSummaryBuilder {
     static func make(
         period: AttendancePeriod,
         records: [AttendanceRecord],
-        calendar: Calendar = .autoupdatingCurrent
+        calendar: Calendar = DakaCalendar.china
     ) -> [DailyAttendanceSummary] {
         period.allDays(calendar: calendar).map { day in
             let record = records.first {

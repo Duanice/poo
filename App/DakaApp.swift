@@ -20,6 +20,8 @@ struct DakaApp: App {
         WindowGroup(id: "main") {
             ContentView()
                 .environmentObject(store)
+                .environment(\.calendar, DakaCalendar.china)
+                .environment(\.timeZone, DakaCalendar.timeZone)
                 .modelContainer(modelContainer)
                 .frame(minWidth: 940, minHeight: 650)
                 .onOpenURL { url in
@@ -40,6 +42,8 @@ struct DakaApp: App {
         MenuBarExtra {
             MenuBarAttendanceView()
                 .environmentObject(store)
+                .environment(\.calendar, DakaCalendar.china)
+                .environment(\.timeZone, DakaCalendar.timeZone)
         } label: {
             Label(
                 "\(AttendanceCalculator.compactDuration(store.currentTotalMinutes)) / \(AttendanceCalculator.compactDuration(AppSettingsSnapshot.load().targetMinutes))",
@@ -51,6 +55,8 @@ struct DakaApp: App {
         Settings {
             SettingsView()
                 .environmentObject(store)
+                .environment(\.calendar, DakaCalendar.china)
+                .environment(\.timeZone, DakaCalendar.timeZone)
                 .frame(width: 520, height: 500)
         }
     }

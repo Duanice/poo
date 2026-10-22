@@ -52,6 +52,8 @@ enum NotificationService {
         content.sound = .default
 
         var components = DateComponents()
+        components.calendar = DakaCalendar.china
+        components.timeZone = DakaCalendar.timeZone
         components.hour = minuteOfDay / 60
         components.minute = minuteOfDay % 60
 

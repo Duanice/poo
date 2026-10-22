@@ -42,7 +42,7 @@ struct TodayEditorView: View {
         )
         let isCrossing = {
             guard let checkOut = record?.checkOut else { return false }
-            return !Calendar.current.isDate(checkOut, inSameDayAs: workDate)
+            return !DakaCalendar.china.isDate(checkOut, inSameDayAs: workDate)
         }()
 
         _hasCheckIn = State(initialValue: record == nil || record?.checkIn != nil)
@@ -208,7 +208,7 @@ struct TodayEditorView: View {
                             .foregroundStyle(.secondary)
                         Spacer()
                         Button(
-                            Calendar.current.isDateInToday(workDate)
+                            DakaCalendar.china.isDateInToday(workDate)
                                 ? "今天外出自习"
                                 : "设为外出自习"
                         ) {
@@ -220,7 +220,7 @@ struct TodayEditorView: View {
                         }
                         .tint(.green)
 
-                        Button(Calendar.current.isDateInToday(workDate) ? "今天摆烂" : "设为摆烂日") {
+                        Button(DakaCalendar.china.isDateInToday(workDate) ? "今天摆烂" : "设为摆烂日") {
                             if store.requiresClearingBeforeSlacking(on: workDate) {
                                 showSlackingConfirmation = true
                             } else if store.setSlacking(on: workDate, enabled: true) {
@@ -256,12 +256,12 @@ struct TodayEditorView: View {
                         Button("现在上班") {
                             store.checkInNow()
                         }
-                        .disabled(!Calendar.current.isDateInToday(workDate))
+                        .disabled(!DakaCalendar.china.isDateInToday(workDate))
 
                         Button("现在下班") {
                             store.checkOutNow()
                         }
-                        .disabled(!Calendar.current.isDateInToday(workDate))
+                        .disabled(!DakaCalendar.china.isDateInToday(workDate))
 
                         Button("保存记录") {
                             save()
